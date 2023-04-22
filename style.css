@@ -16,6 +16,12 @@ header button {
     margin: 0 4vw;
 }
 
+header + div {
+    margin: 4vw;
+    padding: 1vw;
+    text-align: center;
+}
+
 article {
     margin: 8vw 0;
     box-shadow: 1px 1px 4px darkgrey;
@@ -40,12 +46,12 @@ button {
         padding: 0 20vw 100vh;
     }
 
-    header div * {
-        margin: 0 2vw;
+    header + div {
+        margin: 1vh 2vw;
     }
 
     article {
-        margin: 4vw 0;
+        margin: 1vw 0 4vw;
     }
 
     button {
