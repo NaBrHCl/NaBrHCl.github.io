@@ -11,6 +11,12 @@ let keyUpMode = false;  // false = check for letter, true = check for space
 const PAUSE = 10; // how frequently is each action performed, in milliseconds
 const KEY = 'c'; // the key for input, the program only reacts to this key
 
+let AC = new AudioContext();
+let BEEP = AC.createOscillator();
+BEEP.type = 'sine';
+BEEP.frequency.value = 800;
+BEEP.connect(AC.destination);
+
 // time length margin of short / long signal measured in milliseconds.
 // any signal shorter than this is a short signal, any signal longer than or equal to this is a long signal
 const LONG_MARGIN = 8;
@@ -19,7 +25,19 @@ const LONG_MARGIN = 8;
 // if the key is released and the user doesn't press it within this time length, the signal will be considered as space
 const SPACE_MARGIN = 12;
 
+function activateAudio() {
+    beepStart();
+    setTimeout(function () {
+        beepStop();
+    }, PAUSE);    
+}
+
 document.addEventListener('keydown', function (event) {
+
+    if (!event.repeat) {
+        beepStart();
+    }
+
     keyPressed = event.key;
 
     if (keyPressed == KEY) {
@@ -27,9 +45,12 @@ document.addEventListener('keydown', function (event) {
         stopKeyUpTimer();
         startKeydownTimer();
     }
+
 });
 
 document.addEventListener('keyup', function () {
+
+    beepStop();
 
     stopKeyDownTimer();
 
@@ -100,6 +121,18 @@ function parseLetter() {
 function stopKeyUpTimer() {
     clearInterval(intervalIdUp);
     upTimerStarted = false;
+}
+
+async function beepStart() {
+    BEEP.start();
+}
+
+async function beepStop() {
+    BEEP.stop();
+    BEEP = AC.createOscillator();
+    BEEP.type = 'sine';
+    BEEP.frequency.value = 800;
+    BEEP.connect(AC.destination);
 }
 
 const MORSE = {

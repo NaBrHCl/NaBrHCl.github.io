@@ -1,7 +1,47 @@
-#input {
-
+body {
+    margin: 0 2vw;
+    padding: 0 4vw 100vh;
 }
 
-#output {
-    
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+}
+
+header div * {
+    margin: 0 4vw;
+}
+
+article {
+    margin: 4vw 0;
+    box-shadow: 1px 1px 4px darkgrey;
+    min-height: 12em;
+    padding: 2%;
+}
+
+button {
+    padding: 1vw;
+}
+
+#input {}
+
+#output {}
+
+@media only screen and (min-width: 1200px) {
+    body {
+        margin: 0 4vw;
+        padding: 0 20vw 100vh;
+    }
+
+    header div * {
+        margin: 0 2vw;
+    }
+
+    button {
+        padding: 0.1vw;
+    }
+
 }
