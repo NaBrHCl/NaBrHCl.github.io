@@ -13,15 +13,13 @@
 <body>
     <header>
         <h1>Morse Code Practice</h1>
-        <div>
-            <button onclick="activateAudio();">Activate Audio</button>
-            <button onclick="reset();">Clear Text</button>
-        </div>
+            <button onclick="clearText();">Clear Text</button>
     </header>
     <article>
         Input: <div id="input"></div>
         Output: <div id="output"></div>
     </article>
+    <button id="key-button" onmousedown="buttonDown();" onmouseup="buttonUp();"></button>
 </body>
 
 </html>

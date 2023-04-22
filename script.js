@@ -8,14 +8,13 @@ let letter; // letter sent
 let keyPressed; // user key press
 let upTimerStarted = false; // if key up loop has started already
 let keyUpMode = false;  // false = check for letter, true = check for space
+let AC; // audio context
+let BEEP; // oscillator
 const PAUSE = 10; // how frequently is each action performed, in milliseconds
 const KEY = 'c'; // the key for input, the program only reacts to this key
 
-let AC = new AudioContext();
-let BEEP = AC.createOscillator();
-BEEP.type = 'sine';
-BEEP.frequency.value = 800;
-BEEP.connect(AC.destination);
+const INPUT_ELEMENT = 'input'; // name of the input element
+const OUTPUT_ELEMENT = 'output'; // name of the output element
 
 // time length margin of short / long signal measured in milliseconds.
 // any signal shorter than this is a short signal, any signal longer than or equal to this is a long signal
@@ -25,11 +24,13 @@ const LONG_MARGIN = 8;
 // if the key is released and the user doesn't press it within this time length, the signal will be considered as space
 const SPACE_MARGIN = 12;
 
-function activateAudio() {
-    beepStart();
-    setTimeout(function () {
-        beepStop();
-    }, PAUSE);    
+AC = new AudioContext();
+
+beepInit();
+
+function clearText() {
+    document.getElementById(INPUT_ELEMENT).innerHTML = '';
+    document.getElementById(OUTPUT_ELEMENT).innerHTML = '';
 }
 
 document.addEventListener('keydown', function (event) {
@@ -48,6 +49,16 @@ document.addEventListener('keydown', function (event) {
 
 });
 
+function buttonDown() {
+
+    beepStart();
+
+    keyUpMode = false;
+    stopKeyUpTimer();
+    startKeydownTimer();
+
+}
+
 document.addEventListener('keyup', function () {
 
     beepStop();
@@ -65,10 +76,30 @@ document.addEventListener('keyup', function () {
             signal = '.';
         }
 
-        document.getElementById('input').innerHTML += signal;
+        document.getElementById(INPUT_ELEMENT).innerHTML += signal;
         letterMorse += signal;
     }
 });
+
+function buttonUp() {
+
+    beepStop();
+
+    stopKeyDownTimer();
+
+    if (!upTimerStarted) {
+        startKeyUpTimer();
+    }
+
+    if (tickDown >= LONG_MARGIN) {
+        signal = '-';
+    } else {
+        signal = '.';
+    }
+
+    document.getElementById(INPUT_ELEMENT).innerHTML += signal;
+    letterMorse += signal;
+}
 
 function startKeydownTimer() {
     tickDown = 0;
@@ -93,15 +124,15 @@ function startKeyUpTimer() {
 
             if (!keyUpMode) {
                 parseLetter();
-                document.getElementById('output').innerHTML += letter;
-                document.getElementById('input').innerHTML += ' ';
+                document.getElementById(OUTPUT_ELEMENT).innerHTML += letter;
+                document.getElementById(INPUT_ELEMENT).innerHTML += ' ';
                 letterMorse = '';
                 keyUpMode = true;
                 stopKeyUpTimer();
                 startKeyUpTimer();
             } else {
-                document.getElementById('output').innerHTML += ' ';
-                document.getElementById('input').innerHTML += ' / ';
+                document.getElementById(OUTPUT_ELEMENT).innerHTML += ' ';
+                document.getElementById(INPUT_ELEMENT).innerHTML += ' / ';
                 keyUpMode = false;
                 stopKeyUpTimer();
             }
@@ -123,16 +154,24 @@ function stopKeyUpTimer() {
     upTimerStarted = false;
 }
 
+function beepInit () {
+    BEEP = AC.createOscillator();
+    BEEP.type = 'sine';
+    BEEP.frequency.value = 800;
+    BEEP.connect(AC.destination);    
+}
+
 async function beepStart() {
     BEEP.start();
 }
 
 async function beepStop() {
     BEEP.stop();
-    BEEP = AC.createOscillator();
-    BEEP.type = 'sine';
-    BEEP.frequency.value = 800;
-    BEEP.connect(AC.destination);
+    beepInit();
+    // BEEP = AC.createOscillator();
+    // BEEP.type = 'sine';
+    // BEEP.frequency.value = 800;
+    // BEEP.connect(AC.destination);
 }
 
 const MORSE = {
