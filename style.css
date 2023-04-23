@@ -16,12 +16,37 @@ body {
     padding: 2%;
 }
 
-#settings input::-webkit-inner-spin-button, #settings input::-webkit-outer-spin-button {
-    display: none;
+#settings-head {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0 2%;
 }
 
-#close-settings {
-    float: right;
+#settings-head h2 {
+    margin: 0;
+}
+
+#settings form {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 4%;
+}
+
+#settings form div {
+    width: 20%;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+#settings input {
+    width: 64px;
+}
+
+#settings input::-webkit-inner-spin-button,
+#settings input::-webkit-outer-spin-button {
+    display: none;
 }
 
 header {

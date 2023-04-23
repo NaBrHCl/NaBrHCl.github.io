@@ -10,6 +10,7 @@ let upTimerStarted = false; // if key up loop has started already
 let keyUpMode = false;  // false = check for letter, true = check for space
 let ac = new AudioContext(); // audio context
 let volume = 0.36;
+let volumeDisplayed;
 
 let gn = ac.createGain(); // gain node
 gn.gain.value = volume; // volume
@@ -18,9 +19,15 @@ gn.connect(ac.destination);
 let beep; // oscillator
 let signalKey = 'c'; // the key for input, the program only reacts to this key
 const PAUSE = 10; // how frequently is each action performed, in milliseconds
+const VOLUME_RATIO = 100; // volumeDisplayed / volume
+const VOLUME_MIN = 0;
+const VOLUME_MAX = 100;
+const DIT_MIN = 1;
 
 const INPUT_ELEMENT = 'input'; // name of the input element
 const OUTPUT_ELEMENT = 'output'; // name of the output element
+const VOLUME_ELEMENT = 'volume'; // name of the volume element
+const DIT_ELEMENT = 'dit'; // name of the dit element
 
 let dit = 4; // time length unit
 
@@ -178,11 +185,35 @@ async function beepStop() {
 function displaySettings() {
     document.getElementById('settings').style.display = 'block';
     document.getElementById('open-settings').style.display = 'none';
+
+    updateVolume();
+    document.getElementById(VOLUME_ELEMENT).setAttribute('placeholder', volumeDisplayed);
+    document.getElementById(DIT_ELEMENT).setAttribute('placeholder', dit);
+
+    document.getElementById(VOLUME_ELEMENT).setAttribute('min', 0);
+    document.getElementById(VOLUME_ELEMENT).setAttribute('max', 100);
+    document.getElementById(VOLUME_ELEMENT).setAttribute('step', 1);
+    document.getElementById(DIT_ELEMENT).setAttribute('min', 1);
 }
 
 function hideSettings() {
     document.getElementById('settings').style.display = 'none';
     document.getElementById('open-settings').style.display = 'block';
+}
+
+function updateVolume(mode) {
+    if (mode) {
+        volume = document.getElementById(VOLUME_ELEMENT).value / VOLUME_RATIO;
+    } else {
+        volumeDisplayed = volume * VOLUME_RATIO;
+    }
+}
+
+function updateSettings(event) {
+    event.preventDefault();
+    updateVolume(true);
+    dit = document.getElementById(DIT_ELEMENT).value;
+    hideSettings();
 }
 
 const MORSE = {
