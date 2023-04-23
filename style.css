@@ -3,6 +3,27 @@ body {
     padding: 0 4vw 100vh;
 }
 
+#settings {
+    display: none;
+    transition: 0.2s;
+    background-color: white;
+    box-shadow: 1px 1px 4px 2px darkgrey;
+    position: absolute;
+    top: 8vh;
+    left: calc(20vw - 2%);
+    width: 60vw;
+    height: 40vw;
+    padding: 2%;
+}
+
+#settings input::-webkit-inner-spin-button, #settings input::-webkit-outer-spin-button {
+    display: none;
+}
+
+#close-settings {
+    float: right;
+}
+
 header {
     display: flex;
     flex-direction: column;
@@ -11,12 +32,29 @@ header {
     text-align: center;
 }
 
+header div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 header button {
     padding: 4px;
     margin: 0 4vw;
 }
 
-header + div {
+button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.svg-btn {
+    border: none;
+    background-color: transparent;
+    padding: 0px;
+}
+
+header+div {
     margin: 4vw;
     padding: 1vw;
     text-align: center;
@@ -46,7 +84,16 @@ button {
         padding: 0 20vw 100vh;
     }
 
-    header + div {
+    button:hover {
+        cursor: pointer;
+    }
+
+    .svg-btn:hover {
+        filter: invert(0.4);
+        transition: 0.2s;
+    }
+
+    header+div {
         margin: 1vh 2vw;
     }
 
