@@ -18,6 +18,7 @@ gn.connect(ac.destination);
 
 let beep; // oscillator
 let signalKey = 'c'; // the key for input, the program only reacts to this key
+let signalKeyChosen; // the key for input that the user changes to in settings
 const PAUSE = 10; // how frequently is each action performed, in milliseconds
 const VOLUME_RATIO = 100; // volumeDisplayed / volume
 const VOLUME_MIN = 0;
@@ -28,6 +29,7 @@ const INPUT_ELEMENT = 'input'; // name of the input element
 const OUTPUT_ELEMENT = 'output'; // name of the output element
 const VOLUME_ELEMENT = 'volume'; // name of the volume element
 const DIT_ELEMENT = 'dit'; // name of the dit element
+const SIGNAL_KEY_ELEMENT = 'signal-key' // bane if the signal key element
 
 let dit = 4; // time length unit
 
@@ -49,6 +51,11 @@ function clearText() {
 document.addEventListener('keydown', function (event) {
 
     keyPressed = event.key;
+
+    if (document.activeElement.id == SIGNAL_KEY_ELEMENT) {
+        signalKeyChosen = keyPressed;
+        document.getElementById(SIGNAL_KEY_ELEMENT).value = signalKeyChosen;
+    }
 
     if (!event.repeat && keyPressed == signalKey) {
         beepStart();
@@ -194,6 +201,8 @@ function displaySettings() {
     document.getElementById(VOLUME_ELEMENT).setAttribute('max', 100);
     document.getElementById(VOLUME_ELEMENT).setAttribute('step', 1);
     document.getElementById(DIT_ELEMENT).setAttribute('min', 1);
+
+    signalKeyChosen = signalKey;
 }
 
 function hideSettings() {
@@ -213,6 +222,8 @@ function updateSettings(event) {
     event.preventDefault();
     updateVolume(true);
     dit = document.getElementById(DIT_ELEMENT).value;
+    signalKey = signalKeyChosen;
+    document.getElementById('instructions').innerHTML = 'Instructions: Press the ' + signalKey +' key or the button below to send signal';
     hideSettings();
 }
 

@@ -25,9 +25,11 @@
         </div>
         <form onsubmit="updateSettings(event);">
             <div>Volume <input type="number" id="volume">
-            <br>Goes from 0 to 100, integer only, controls the sound level</div>
+            <br>Goes from 0 to 100, integer only, controls the sound level / volume</div>
             <div>Dit <input type="number" id="dit">
             <br>Minimum value is 1. The higher this value is, the slower the program runs</div>
+            <div>Key <input type="text" id="signal-key">
+            <br>Enter a key here and press confirm to change the key for sending signal</div>
             <input type="submit" value="Confirm">
         </form>
     </section>
@@ -44,7 +46,7 @@
             </button>
         </div>
     </header>
-    <div>Instructions: Press the C key or the button below to send signal</div>
+    <div id="instructions">Instructions: Press the C key or the button below to send signal</div>
     <article>
         Input: <div id="input"></div>
         Output: <div id="output"></div>
