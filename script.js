@@ -52,6 +52,10 @@ document.addEventListener('keydown', function (event) {
 
     keyPressed = event.key;
 
+    if (signalKey == ' ' && keyPressed == ' ') {
+        event.preventDefault();
+    }
+
     if (document.activeElement.id == SIGNAL_KEY_ELEMENT) {
         signalKeyChosen = keyPressed;
         document.getElementById(SIGNAL_KEY_ELEMENT).value = signalKeyChosen;
