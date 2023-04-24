@@ -19,6 +19,7 @@ gn.connect(ac.destination);
 
 let beep; // oscillator
 let signalKey = 'c'; // the key for input, the program only reacts to this key
+let signalKeyText; // what the signal key is called, in plain text
 let signalKeyChosen; // the key for input that the user changes to in settings
 const PAUSE = 10; // how frequently is each action performed, in milliseconds
 const VOLUME_RATIO = 100; // volumeDisplayed / volume
@@ -74,7 +75,8 @@ document.addEventListener('keydown', function (event) {
 
     if (document.activeElement == SIGNAL_KEY_ELEMENT) {
         signalKeyChosen = keyPressed;
-        SIGNAL_KEY_ELEMENT.value = signalKeyChosen;
+        signalKeyText = event.code;
+        SIGNAL_KEY_ELEMENT.value = event.code;
     }
 
     if (!event.repeat && keyPressed == signalKey) {
@@ -219,6 +221,7 @@ function displaySettings() {
     updateVolume();
     VOLUME_ELEMENT.value = volumeDisplayed;
     DIT_ELEMENT.value = dit;
+    SIGNAL_KEY_ELEMENT.value = signalKey;
 
     VOLUME_ELEMENT.setAttribute('min', 0);
     VOLUME_ELEMENT.setAttribute('max', 100);
@@ -248,7 +251,7 @@ function updateSettings(event) {
     dit = DIT_ELEMENT.value;
     signalKey = signalKeyChosen;
     
-    INSTRUCTIONS_ELEMENT.innerHTML = 'Instructions: Press the ' + signalKey + ' key or the button below to send signal';
+    INSTRUCTIONS_ELEMENT.innerHTML = 'Instructions: Press the ' + signalKeyText + ' key or the button below to send signal';
     hideSettings();
 }
 
