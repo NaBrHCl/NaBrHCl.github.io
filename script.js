@@ -181,6 +181,7 @@ function beepInit() {
     beep = ac.createOscillator();
     beep.type = 'sine';
     beep.frequency.value = 800;
+    gn.gain.value = volume;
     beep.connect(gn).connect(ac.destination);
 }
 
