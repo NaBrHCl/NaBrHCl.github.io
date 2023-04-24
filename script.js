@@ -7,6 +7,7 @@ let letterMorse = ''; // letter sent (in morse code)
 let letter; // letter sent
 let keyPressed; // user key press
 let upTimerStarted = false; // if key up loop has started already
+let downTimerStarted = false; // if key down loop has started already
 let keyUpMode = false;  // false = check for letter, true = check for space
 let ac = new AudioContext(); // audio context
 let volume = 0.36;
@@ -49,7 +50,7 @@ function clearText() {
 }
 
 document.addEventListener('keydown', function (event) {
-
+    console.log('start:' + tickDown);
     keyPressed = event.key;
 
     if (signalKey == ' ' && keyPressed == ' ') {
@@ -68,7 +69,10 @@ document.addEventListener('keydown', function (event) {
     if (keyPressed == signalKey) {
         keyUpMode = false;
         stopKeyUpTimer();
-        startKeydownTimer();
+        if (!downTimerStarted) {
+            startKeydownTimer();
+            downTimerStarted = true;
+        }
     }
 
 });
@@ -90,6 +94,8 @@ document.addEventListener('keyup', function () {
     }
 
     stopKeyDownTimer();
+    downTimerStarted = false;
+    console.log('stop:' + tickDown);
 
     if (keyPressed == signalKey) {
         if (!upTimerStarted) {
