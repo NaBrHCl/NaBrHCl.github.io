@@ -26,11 +26,15 @@ const VOLUME_MIN = 0;
 const VOLUME_MAX = 100;
 const DIT_MIN = 1;
 
-const INPUT_ELEMENT = 'input'; // name of the input element
-const OUTPUT_ELEMENT = 'output'; // name of the output element
-const VOLUME_ELEMENT = 'volume'; // name of the volume element
-const DIT_ELEMENT = 'dit'; // name of the dit element
-const SIGNAL_KEY_ELEMENT = 'signal-key' // bane if the signal key element
+// elements that will be set once the body element loads
+let INPUT_ELEMENT;
+let OUTPUT_ELEMENT;
+let VOLUME_ELEMENT;
+let DIT_ELEMENT;
+let SIGNAL_KEY_ELEMENT;
+let SETTINGS_ELEMENT;
+let OPEN_SETTINGS_ELEMENT;
+let INSTRUCTIONS_ELEMENT;
 
 let dit = 4; // time length unit
 
@@ -44,22 +48,33 @@ let spaceMargin = dit * 7;
 
 beepInit();
 
+function setElement() {
+    INPUT_ELEMENT = document.getElementById('input');
+    OUTPUT_ELEMENT = document.getElementById('output');
+    VOLUME_ELEMENT = document.getElementById('volume');
+    DIT_ELEMENT = document.getElementById('dit');
+    SIGNAL_KEY_ELEMENT = document.getElementById('signal-key');
+    SETTINGS_ELEMENT = document.getElementById('settings');
+    OPEN_SETTINGS_ELEMENT = document.getElementById('open-settings');
+    INSTRUCTIONS_ELEMENT = document.getElementById('instructions');
+}
+
 function clearText() {
-    document.getElementById(INPUT_ELEMENT).innerHTML = '';
-    document.getElementById(OUTPUT_ELEMENT).innerHTML = '';
+    INPUT_ELEMENT.innerHTML = '';
+    OUTPUT_ELEMENT.innerHTML = '';
 }
 
 document.addEventListener('keydown', function (event) {
-    console.log('start:' + tickDown);
+
     keyPressed = event.key;
 
     if (signalKey == ' ' && keyPressed == ' ') {
         event.preventDefault();
     }
 
-    if (document.activeElement.id == SIGNAL_KEY_ELEMENT) {
+    if (document.activeElement == SIGNAL_KEY_ELEMENT) {
         signalKeyChosen = keyPressed;
-        document.getElementById(SIGNAL_KEY_ELEMENT).value = signalKeyChosen;
+        SIGNAL_KEY_ELEMENT.value = signalKeyChosen;
     }
 
     if (!event.repeat && keyPressed == signalKey) {
@@ -74,7 +89,6 @@ document.addEventListener('keydown', function (event) {
             downTimerStarted = true;
         }
     }
-
 });
 
 function buttonDown() {
@@ -84,7 +98,6 @@ function buttonDown() {
     keyUpMode = false;
     stopKeyUpTimer();
     startKeydownTimer();
-
 }
 
 document.addEventListener('keyup', function () {
@@ -95,7 +108,6 @@ document.addEventListener('keyup', function () {
 
     stopKeyDownTimer();
     downTimerStarted = false;
-    console.log('stop:' + tickDown);
 
     if (keyPressed == signalKey) {
         if (!upTimerStarted) {
@@ -108,7 +120,7 @@ document.addEventListener('keyup', function () {
             signal = '.';
         }
 
-        document.getElementById(INPUT_ELEMENT).innerHTML += signal;
+        INPUT_ELEMENT.innerHTML += signal;
         letterMorse += signal;
     }
 });
@@ -129,7 +141,7 @@ function buttonUp() {
         signal = '.';
     }
 
-    document.getElementById(INPUT_ELEMENT).innerHTML += signal;
+    INPUT_ELEMENT.innerHTML += signal;
     letterMorse += signal;
 }
 
@@ -154,15 +166,15 @@ function startKeyUpTimer() {
 
         if (!keyUpMode && tickUp >= longMargin) {
             parseLetter();
-            document.getElementById(OUTPUT_ELEMENT).innerHTML += letter;
-            document.getElementById(INPUT_ELEMENT).innerHTML += ' ';
+            OUTPUT_ELEMENT.innerHTML += letter;
+            INPUT_ELEMENT.innerHTML += ' ';
             letterMorse = '';
             keyUpMode = true;
             stopKeyUpTimer();
             startKeyUpTimer();
         } else if (keyUpMode && tickUp >= spaceMargin) {
-            document.getElementById(OUTPUT_ELEMENT).innerHTML += ' ';
-            document.getElementById(INPUT_ELEMENT).innerHTML += ' / ';
+            OUTPUT_ELEMENT.innerHTML += ' ';
+            INPUT_ELEMENT.innerHTML += ' / ';
             keyUpMode = false;
             stopKeyUpTimer();
         }
@@ -201,29 +213,29 @@ async function beepStop() {
 }
 
 function displaySettings() {
-    document.getElementById('settings').style.display = 'block';
-    document.getElementById('open-settings').style.display = 'none';
+    SETTINGS_ELEMENT.style.display = 'block';
+    OPEN_SETTINGS_ELEMENT.style.display = 'none';
 
     updateVolume();
-    document.getElementById(VOLUME_ELEMENT).value = volumeDisplayed;
-    document.getElementById(DIT_ELEMENT).value = dit;
+    VOLUME_ELEMENT.value = volumeDisplayed;
+    DIT_ELEMENT.value = dit;
 
-    document.getElementById(VOLUME_ELEMENT).setAttribute('min', 0);
-    document.getElementById(VOLUME_ELEMENT).setAttribute('max', 100);
-    document.getElementById(VOLUME_ELEMENT).setAttribute('step', 1);
-    document.getElementById(DIT_ELEMENT).setAttribute('min', 1);
+    VOLUME_ELEMENT.setAttribute('min', 0);
+    VOLUME_ELEMENT.setAttribute('max', 100);
+    VOLUME_ELEMENT.setAttribute('step', 1);
+    DIT_ELEMENT.setAttribute('min', 1);
 
     signalKeyChosen = signalKey;
 }
 
 function hideSettings() {
-    document.getElementById('settings').style.display = 'none';
-    document.getElementById('open-settings').style.display = 'block';
+    SETTINGS_ELEMENT.style.display = 'none';
+    OPEN_SETTINGS_ELEMENT.style.display = 'block';
 }
 
 function updateVolume(mode) {
     if (mode) {
-        volume = document.getElementById(VOLUME_ELEMENT).value / VOLUME_RATIO;
+        volume = VOLUME_ELEMENT.value / VOLUME_RATIO;
     } else {
         volumeDisplayed = volume * VOLUME_RATIO;
     }
@@ -233,9 +245,10 @@ function updateSettings(event) {
     event.preventDefault();
     updateVolume(true);
     beepInit();
-    dit = document.getElementById(DIT_ELEMENT).value;
+    dit = DIT_ELEMENT.value;
     signalKey = signalKeyChosen;
-    document.getElementById('instructions').innerHTML = 'Instructions: Press the ' + signalKey +' key or the button below to send signal';
+    
+    INSTRUCTIONS_ELEMENT.innerHTML = 'Instructions: Press the ' + signalKey + ' key or the button below to send signal';
     hideSettings();
 }
 
