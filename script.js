@@ -199,8 +199,8 @@ function displaySettings() {
     document.getElementById('open-settings').style.display = 'none';
 
     updateVolume();
-    document.getElementById(VOLUME_ELEMENT).setAttribute('placeholder', volumeDisplayed);
-    document.getElementById(DIT_ELEMENT).setAttribute('placeholder', dit);
+    document.getElementById(VOLUME_ELEMENT).value = volumeDisplayed;
+    document.getElementById(DIT_ELEMENT).value = dit;
 
     document.getElementById(VOLUME_ELEMENT).setAttribute('min', 0);
     document.getElementById(VOLUME_ELEMENT).setAttribute('max', 100);
@@ -226,6 +226,7 @@ function updateVolume(mode) {
 function updateSettings(event) {
     event.preventDefault();
     updateVolume(true);
+    beepInit();
     dit = document.getElementById(DIT_ELEMENT).value;
     signalKey = signalKeyChosen;
     document.getElementById('instructions').innerHTML = 'Instructions: Press the ' + signalKey +' key or the button below to send signal';
