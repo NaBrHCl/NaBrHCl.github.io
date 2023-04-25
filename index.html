@@ -28,7 +28,7 @@
                     </svg>
                 </button>
             </div>
-            <form onsubmit="updateSettings(event);">
+            <form onsubmit="updateSettings(event);" autocomplete="off">
                     <div>Volume <input type="number" id="volume">
                         <br>Goes from 0 to 100, integer only, controls the sound level / volume
                     </div>
@@ -57,7 +57,7 @@
                 </button>
             </div>
         </header>
-        <div id="instructions">Instructions: Press the C key or the button below to send signal</div>
+        <div id="instructions">Instructions: Press KeyC or the button below to send signal</div>
         <article>
             Input: <div id="input"></div>
             Output: <div id="output"></div>

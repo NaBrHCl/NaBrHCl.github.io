@@ -52,6 +52,8 @@ beepInit();
 let wholeList;
 let eachLine;
 
+const preventDefaultKeys = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'];
+
 function initialise() {
     INPUT_ELEMENT = document.getElementById('input');
     OUTPUT_ELEMENT = document.getElementById('output');
@@ -98,8 +100,10 @@ document.addEventListener('keydown', function (event) {
 
     keyPressed = event.key;
 
-    if (signalKey == ' ' && keyPressed == ' ') {
-        event.preventDefault();
+    for (let i = 0; i < preventDefaultKeys.length; i++) {
+        if (signalKey == preventDefaultKeys[i] && keyPressed == preventDefaultKeys[i]) {
+            event.preventDefault();
+        }
     }
 
     if (document.activeElement == SIGNAL_KEY_ELEMENT) {
