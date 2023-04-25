@@ -19,7 +19,7 @@ gn.connect(ac.destination);
 
 let beep; // oscillator
 let signalKey = 'c'; // the key for input, the program only reacts to this key
-let signalKeyText; // what the signal key is called, in plain text
+let signalKeyText = 'KeyC'; // what the signal key is called, in plain text
 let signalKeyChosen; // the key for input that the user changes to in settings
 const PAUSE = 10; // how frequently is each action performed, in milliseconds
 const VOLUME_RATIO = 100; // volumeDisplayed / volume
@@ -49,15 +49,41 @@ let spaceMargin = dit * 7;
 
 beepInit();
 
-function setElement() {
+let wholeList;
+let eachLine;
+
+function initialise() {
     INPUT_ELEMENT = document.getElementById('input');
     OUTPUT_ELEMENT = document.getElementById('output');
     VOLUME_ELEMENT = document.getElementById('volume');
     DIT_ELEMENT = document.getElementById('dit');
     SIGNAL_KEY_ELEMENT = document.getElementById('signal-key');
+    CHART_ELEMENT = document.getElementById('chart');
     SETTINGS_ELEMENT = document.getElementById('settings');
     OPEN_SETTINGS_ELEMENT = document.getElementById('open-settings');
     INSTRUCTIONS_ELEMENT = document.getElementById('instructions');
+
+    let morseCode = Object.keys(MORSE);
+    let morseLetter = Object.values(MORSE);
+    let morseList = '';
+    let linePos;
+    let eachLine;
+
+    for (let i = 0; i < morseCode.length; i++) {
+        if (i == 0) {
+            linePos = document.getElementById('list-left-A');
+        } else if (i == morseCode.length / 4) {
+            linePos = document.getElementById('list-right-A');
+        } else if (i == morseCode.length / 2) {
+            linePos = document.getElementById('list-left-B');
+        } else if (i == morseCode.length * 3 / 4) {
+            linePos = document.getElementById('list-right-B');
+        }
+
+        eachLine = document.createElement('div');
+        eachLine.textContent = morseLetter[i] + '  ' + morseCode[i];
+        linePos.appendChild(eachLine);
+    }
 }
 
 function clearText() {
@@ -222,7 +248,7 @@ function displaySettings() {
     updateVolume();
     VOLUME_ELEMENT.value = volumeDisplayed;
     DIT_ELEMENT.value = dit;
-    SIGNAL_KEY_ELEMENT.value = signalKey;
+    SIGNAL_KEY_ELEMENT.value = signalKeyText;
 
     VOLUME_ELEMENT.setAttribute('min', 0);
     VOLUME_ELEMENT.setAttribute('max', 100);
@@ -250,10 +276,15 @@ function updateSettings(event) {
     updateVolume(true);
     beepInit();
     dit = DIT_ELEMENT.value;
+    longMargin = dit * 3;
+    spaceMargin = dit * 7;
+
     signalKey = signalKeyChosen;
-    
+
     INSTRUCTIONS_ELEMENT.innerHTML = 'Instructions: Press ' + signalKeyText + ' or the button below to send signal';
     hideSettings();
+
+    console.log(CHART_ELEMENT.checked);
 }
 
 const MORSE = {
