@@ -62,10 +62,11 @@ function initialise() {
     SETTINGS_ELEMENT = document.getElementById('settings');
     OPEN_SETTINGS_ELEMENT = document.getElementById('open-settings');
     INSTRUCTIONS_ELEMENT = document.getElementById('instructions');
+    LIST_LEFT_ELEMENT = document.getElementById('list-left');
+    LIST_RIGHT_ELEMENT = document.getElementById('list-right');
 
     let morseCode = Object.keys(MORSE);
     let morseLetter = Object.values(MORSE);
-    let morseList = '';
     let linePos;
     let eachLine;
 
@@ -84,6 +85,8 @@ function initialise() {
         eachLine.textContent = morseLetter[i] + '  ' + morseCode[i];
         linePos.appendChild(eachLine);
     }
+
+    showHideChart();
 }
 
 function clearText() {
@@ -281,10 +284,20 @@ function updateSettings(event) {
 
     signalKey = signalKeyChosen;
 
+    showHideChart();
+
     INSTRUCTIONS_ELEMENT.innerHTML = 'Instructions: Press ' + signalKeyText + ' or the button below to send signal';
     hideSettings();
+}
 
-    console.log(CHART_ELEMENT.checked);
+function showHideChart() {
+    if (CHART_ELEMENT.checked) {
+        LIST_LEFT_ELEMENT.style.visibility = 'visible';
+        LIST_RIGHT_ELEMENT.style.visibility = 'visible';
+    } else {
+        LIST_LEFT_ELEMENT.style.visibility = 'hidden';
+        LIST_RIGHT_ELEMENT.style.visibility = 'hidden';
+    }
 }
 
 const MORSE = {
