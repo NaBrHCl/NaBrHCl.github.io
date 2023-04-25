@@ -74,6 +74,7 @@ document.addEventListener('keydown', function (event) {
     }
 
     if (document.activeElement == SIGNAL_KEY_ELEMENT) {
+        event.preventDefault();
         signalKeyChosen = keyPressed;
         signalKeyText = event.code;
         SIGNAL_KEY_ELEMENT.value = event.code;
@@ -251,7 +252,7 @@ function updateSettings(event) {
     dit = DIT_ELEMENT.value;
     signalKey = signalKeyChosen;
     
-    INSTRUCTIONS_ELEMENT.innerHTML = 'Instructions: Press the ' + signalKeyText + ' key or the button below to send signal';
+    INSTRUCTIONS_ELEMENT.innerHTML = 'Instructions: Press ' + signalKeyText + ' or the button below to send signal';
     hideSettings();
 }
 
