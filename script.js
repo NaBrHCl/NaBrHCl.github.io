@@ -12,6 +12,10 @@ let keyUpMode = false;  // false = check for letter, true = check for space
 let ac = new AudioContext(); // audio context
 let volume = 0.36;
 let volumeDisplayed;
+let letterRecord = '';
+let morseRecord = '';
+let letterRecords = [];
+let morseRecords = [];
 
 let gn = ac.createGain(); // gain node
 gn.gain.value = volume; // volume
@@ -157,6 +161,7 @@ document.addEventListener('keyup', function () {
         }
 
         INPUT_ELEMENT.innerHTML += signal;
+        morseRecord += signal;
         letterMorse += signal;
     }
 });
@@ -179,6 +184,7 @@ function buttonUp() {
 
     INPUT_ELEMENT.innerHTML += signal;
     letterMorse += signal;
+    morseRecord += signal;
 }
 
 function startKeydownTimer() {
@@ -201,17 +207,33 @@ function startKeyUpTimer() {
         tickUp++;
 
         if (!keyUpMode && tickUp >= longMargin) {
+
             parseLetter();
             OUTPUT_ELEMENT.innerHTML += letter;
+
+            letterRecord += letter;
+            morseRecord += ' ';
             INPUT_ELEMENT.innerHTML += ' ';
             letterMorse = '';
             keyUpMode = true;
+
             stopKeyUpTimer();
             startKeyUpTimer();
+
         } else if (keyUpMode && tickUp >= spaceMargin) {
+
             OUTPUT_ELEMENT.innerHTML += ' ';
             INPUT_ELEMENT.innerHTML += ' / ';
             keyUpMode = false;
+            letterRecords.push(letterRecord);
+            letterRecord = '';
+            morseRecord = morseRecord.slice(0, -1);
+            morseRecords.push(morseRecord);
+            morseRecord = '';
+
+            console.log(letterRecords);
+            console.log(morseRecords);
+
             stopKeyUpTimer();
         }
 
