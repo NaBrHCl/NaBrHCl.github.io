@@ -231,13 +231,17 @@ function startKeyUpTimer() {
             morseRecords.push(morseRecord);
             morseRecord = '';
 
-            console.log(letterRecords);
-            console.log(morseRecords);
-
             stopKeyUpTimer();
         }
 
     }, PAUSE);
+}
+
+function backspace() {
+    INPUT_ELEMENT.innerHTML = INPUT_ELEMENT.innerHTML.slice(0, -morseRecords[morseRecords.length - 1].length - 4);
+    morseRecords.pop();
+    OUTPUT_ELEMENT.innerHTML = OUTPUT_ELEMENT.innerHTML.slice(0, -letterRecords[letterRecords.length - 1].length - 1);
+    letterRecords.pop();
 }
 
 function parseLetter() {
