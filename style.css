@@ -134,6 +134,14 @@ button {
     justify-content: space-around;
 }
 
+#among-us {
+    display: none;
+    position: absolute;
+    top: 25vh;
+    left: 0;
+    width: 20%;
+}
+
 @media only screen and (min-width: 1200px) {
     body {
         margin: 0 6vw;

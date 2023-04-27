@@ -17,6 +17,13 @@ let morseRecord = '';
 let letterRecords = [];
 let morseRecords = [];
 
+let easterEggPlayed = false; // easter egg will only play once
+let amongUsPos = 0; // position of among us picture
+let easterEggIteration = 0;
+let intervalEasterEgg;
+const EASTER_EGG_TEXT = ['AMONGUS', 'AMOGUS'];
+const sus = new Audio('./assets/among-us-role-reveal.mp3');
+
 let gn = ac.createGain(); // gain node
 gn.gain.value = volume; // volume
 gn.connect(ac.destination);
@@ -70,6 +77,8 @@ function initialise() {
     INSTRUCTIONS_ELEMENT = document.getElementById('instructions');
     LIST_LEFT_ELEMENT = document.getElementById('list-left');
     LIST_RIGHT_ELEMENT = document.getElementById('list-right');
+
+    AMONG_US_ELEMENT = document.getElementById('among-us');
 
     let morseCode = Object.keys(MORSE);
     let morseLetter = Object.values(MORSE);
@@ -225,6 +234,26 @@ function startKeyUpTimer() {
             OUTPUT_ELEMENT.innerHTML += ' ';
             INPUT_ELEMENT.innerHTML += ' / ';
             keyUpMode = false;
+
+            if (!easterEggPlayed) {
+                EASTER_EGG_TEXT.forEach(function (EASTER_EGG_STRING) {
+                    if (letterRecord.trim() == EASTER_EGG_STRING) {
+                        sus.play();
+                        easterEggPlayed = true;
+                        AMONG_US_ELEMENT.style.display = 'block';
+                        intervalEasterEgg = setInterval(function () {
+                            amongUsPos += 2;
+                            AMONG_US_ELEMENT.style.left = amongUsPos + 'vw';
+                            easterEggIteration++;
+                            if (easterEggIteration == 50) {
+                                clearInterval(intervalEasterEgg);
+                                AMONG_US_ELEMENT.style.display = 'none';
+                            }
+                        }, PAUSE);
+                    }
+                });
+            }
+
             letterRecords.push(letterRecord);
             letterRecord = '';
             morseRecord = morseRecord.slice(0, -1);
