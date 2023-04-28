@@ -10,18 +10,18 @@ let upTimerStarted = false; // if key up loop has started already
 let downTimerStarted = false; // if key down loop has started already
 let keyUpMode = false;  // false = check for letter, true = check for space
 let ac = new AudioContext(); // audio context
-let volume = 0.36;
-let volumeDisplayed;
-let letterRecord = '';
-let morseRecord = '';
-let letterRecords = [];
-let morseRecords = [];
+let volume = 0.36; // audio volume
+let volumeDisplayed; // volumeDisplayed is converted from the actual volume, it gets displayed on the webpage
+let letterRecord = ''; // record of current input word in letter
+let morseRecord = ''; // record of current input word in morse code
+let letterRecords = []; // record of input words in letter
+let morseRecords = []; // record of input words in morse code
 
 let easterEggPlayed = false; // easter egg will only play once
 let amongUsPos = 0; // position of among us picture
 let easterEggIteration = 0;
 let intervalEasterEgg;
-const EASTER_EGG_TEXT = ['AMONGUS', 'AMOGUS'];
+const EASTER_EGG_TEXT = ['AMONGUS', 'AMOGUS']; // if any of 
 const sus = new Audio('./assets/among-us-role-reveal.mp3');
 
 let gn = ac.createGain(); // gain node
@@ -39,14 +39,6 @@ const VOLUME_MAX = 100;
 const DIT_MIN = 1;
 
 // elements that will be set once the body element loads
-let INPUT_ELEMENT;
-let OUTPUT_ELEMENT;
-let VOLUME_ELEMENT;
-let DIT_ELEMENT;
-let SIGNAL_KEY_ELEMENT;
-let SETTINGS_ELEMENT;
-let OPEN_SETTINGS_ELEMENT;
-let INSTRUCTIONS_ELEMENT;
 
 let dit = 4; // time length unit
 
@@ -63,7 +55,7 @@ beepInit();
 let wholeList;
 let eachLine;
 
-const preventDefaultKeys = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'];
+const preventDefaultKeys = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown']; // if any of these keys is the signal key, when it's pressed, the page won't move
 
 function initialise() {
     INPUT_ELEMENT = document.getElementById('input');
@@ -71,10 +63,10 @@ function initialise() {
     VOLUME_ELEMENT = document.getElementById('volume');
     DIT_ELEMENT = document.getElementById('dit');
     SIGNAL_KEY_ELEMENT = document.getElementById('signal-key');
-    CHART_ELEMENT = document.getElementById('chart');
     SETTINGS_ELEMENT = document.getElementById('settings');
     OPEN_SETTINGS_ELEMENT = document.getElementById('open-settings');
     INSTRUCTIONS_ELEMENT = document.getElementById('instructions');
+    CHART_ELEMENT = document.getElementById('chart');
     LIST_LEFT_ELEMENT = document.getElementById('list-left');
     LIST_RIGHT_ELEMENT = document.getElementById('list-right');
 
@@ -237,7 +229,7 @@ function startKeyUpTimer() {
 
             if (!easterEggPlayed) {
                 EASTER_EGG_TEXT.forEach(function (EASTER_EGG_STRING) {
-                    if (letterRecord.trim() == EASTER_EGG_STRING) {
+                    if (letterRecord == EASTER_EGG_STRING) {
                         sus.play();
                         easterEggPlayed = true;
                         AMONG_US_ELEMENT.style.display = 'block';
