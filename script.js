@@ -1,13 +1,7 @@
-let intervalIdDown; // id of the key down loop
-let intervalIdUp; // id of the key up loop
-let tickDown; // time length of key down
-let tickUp; // time length of key up
 let signal; // signal sent (long or short)
 let letterMorse = ''; // letter sent (in morse code)
 let letter; // letter sent
 let keyPressed; // user key press
-let upTimerStarted = false; // if key up loop has started already
-let downTimerStarted = false; // if key down loop has started already
 let keyUpMode = false;  // false = check for letter, true = check for space
 let ac = new AudioContext(); // audio context
 let volume = 0.36; // audio volume
@@ -32,7 +26,6 @@ let beep; // oscillator
 let signalKey = 'c'; // the key for input, the program only reacts to this key
 let signalKeyText = 'KeyC'; // what the signal key is called, in plain text
 let signalKeyChosen; // the key for input that the user changes to in settings
-const PAUSE = 10; // how frequently is each action performed, in milliseconds
 const VOLUME_RATIO = 100; // volumeDisplayed / volume
 const VOLUME_MIN = 0;
 const VOLUME_MAX = 100;
@@ -56,6 +49,98 @@ let wholeList;
 let eachLine;
 
 const preventDefaultKeys = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown']; // if any of these keys is the signal key, when it's pressed, the page won't move
+
+const tick = {
+
+    keyUp: {
+        value: 0,
+        intervalId: 0,
+        timerStarted: false,
+        startTimer: function () {
+            this.value = 0;
+
+            this.intervalId = setInterval(function () {
+                tick.keyUp.value++;
+
+                if (!keyUpMode && tick.keyUp.value >= longMargin) {
+
+                    parseLetter();
+                    OUTPUT_ELEMENT.innerHTML += letter;
+
+                    letterRecord += letter;
+                    morseRecord += ' ';
+                    INPUT_ELEMENT.innerHTML += ' ';
+                    letterMorse = '';
+                    keyUpMode = true;
+
+                    tick.keyUp.stopTimer();
+                    tick.keyUp.startTimer();
+
+                } else if (keyUpMode && tick.keyUp.value >= spaceMargin) {
+
+                    OUTPUT_ELEMENT.innerHTML += ' ';
+                    INPUT_ELEMENT.innerHTML += ' / ';
+                    keyUpMode = false;
+
+                    if (!easterEggPlayed) {
+                        EASTER_EGG_TEXT.forEach(function (EASTER_EGG_STRING) {
+                            if (letterRecord == EASTER_EGG_STRING) {
+                                sus.play();
+                                easterEggPlayed = true;
+                                AMONG_US_ELEMENT.style.display = 'block';
+                                intervalEasterEgg = setInterval(function () {
+                                    amongUsPos += 2;
+                                    AMONG_US_ELEMENT.style.left = amongUsPos + 'vw';
+                                    easterEggIteration++;
+                                    if (easterEggIteration == 50) {
+                                        clearInterval(intervalEasterEgg);
+                                        AMONG_US_ELEMENT.style.display = 'none';
+                                    }
+                                }, tick.LENGTH);
+                            }
+                        });
+                    }
+
+                    letterRecords.push(letterRecord);
+                    letterRecord = '';
+                    morseRecord = morseRecord.slice(0, -1);
+                    morseRecords.push(morseRecord);
+                    morseRecord = '';
+
+                    tick.keyUp.stopTimer();
+                }
+
+            }, tick.LENGTH);
+
+            this.timerStarted = true;
+
+        },
+        stopTimer: function () {
+            clearInterval(this.intervalId);
+            this.timerStarted = false;
+        }
+    },
+
+    keyDown: {
+        value: 0,
+        intervalId: 0,
+        timerStarted: false,
+        startTimer: function () {
+            this.value = 0;
+            this.intervalId = setInterval(function () {
+                tick.keyDown.value ++;
+            }, tick.LENGTH);
+            this.timerStarted = true;
+        },
+        stopTimer: function () {
+            clearInterval(this.intervalId);
+            this.timerStarted = false;
+        }
+
+    },
+
+    LENGTH: 10 // how frequently is each action performed, in milliseconds
+}
 
 function initialise() {
     INPUT_ELEMENT = document.getElementById('input');
@@ -124,10 +209,9 @@ document.addEventListener('keydown', function (event) {
 
     if (keyPressed == signalKey) {
         keyUpMode = false;
-        stopKeyUpTimer();
-        if (!downTimerStarted) {
-            startKeydownTimer();
-            downTimerStarted = true;
+        tick.keyUp.stopTimer();
+        if (!tick.keyDown.timerStarted) {
+            tick.keyDown.startTimer();
         }
     }
 });
@@ -137,8 +221,8 @@ function buttonDown() {
     beepStart();
 
     keyUpMode = false;
-    stopKeyUpTimer();
-    startKeydownTimer();
+    tick.keyUp.stopTimer();
+    tick.keyDown.startTimer();
 }
 
 document.addEventListener('keyup', function () {
@@ -147,15 +231,14 @@ document.addEventListener('keyup', function () {
         beepStop();
     }
 
-    stopKeyDownTimer();
-    downTimerStarted = false;
+    tick.keyDown.stopTimer();
 
     if (keyPressed == signalKey) {
-        if (!upTimerStarted) {
-            startKeyUpTimer();
+        if (!tick.keyUp.timerStarted) {
+            tick.keyUp.startTimer();
         }
 
-        if (tickDown >= longMargin) {
+        if (tick.keyDown.value >= longMargin) {
             signal = '-';
         } else {
             signal = '.';
@@ -171,13 +254,13 @@ function buttonUp() {
 
     beepStop();
 
-    stopKeyDownTimer();
+    keyDown.stopTimer();
 
-    if (!upTimerStarted) {
-        startKeyUpTimer();
+    if (!tick.keyUp.timerStarted) {
+        tick.keyUp.startTimer();
     }
 
-    if (tickDown >= longMargin) {
+    if (tick.keyDown.value >= longMargin) {
         signal = '-';
     } else {
         signal = '.';
@@ -186,76 +269,6 @@ function buttonUp() {
     INPUT_ELEMENT.innerHTML += signal;
     letterMorse += signal;
     morseRecord += signal;
-}
-
-function startKeydownTimer() {
-    tickDown = 0;
-    intervalIdDown = setInterval(function () {
-        tickDown++;
-    }, PAUSE);
-}
-
-function stopKeyDownTimer() {
-    clearInterval(intervalIdDown);
-}
-
-function startKeyUpTimer() {
-    upTimerStarted = true;
-
-    tickUp = 0;
-
-    intervalIdUp = setInterval(function () {
-        tickUp++;
-
-        if (!keyUpMode && tickUp >= longMargin) {
-
-            parseLetter();
-            OUTPUT_ELEMENT.innerHTML += letter;
-
-            letterRecord += letter;
-            morseRecord += ' ';
-            INPUT_ELEMENT.innerHTML += ' ';
-            letterMorse = '';
-            keyUpMode = true;
-
-            stopKeyUpTimer();
-            startKeyUpTimer();
-
-        } else if (keyUpMode && tickUp >= spaceMargin) {
-
-            OUTPUT_ELEMENT.innerHTML += ' ';
-            INPUT_ELEMENT.innerHTML += ' / ';
-            keyUpMode = false;
-
-            if (!easterEggPlayed) {
-                EASTER_EGG_TEXT.forEach(function (EASTER_EGG_STRING) {
-                    if (letterRecord == EASTER_EGG_STRING) {
-                        sus.play();
-                        easterEggPlayed = true;
-                        AMONG_US_ELEMENT.style.display = 'block';
-                        intervalEasterEgg = setInterval(function () {
-                            amongUsPos += 2;
-                            AMONG_US_ELEMENT.style.left = amongUsPos + 'vw';
-                            easterEggIteration++;
-                            if (easterEggIteration == 50) {
-                                clearInterval(intervalEasterEgg);
-                                AMONG_US_ELEMENT.style.display = 'none';
-                            }
-                        }, PAUSE);
-                    }
-                });
-            }
-
-            letterRecords.push(letterRecord);
-            letterRecord = '';
-            morseRecord = morseRecord.slice(0, -1);
-            morseRecords.push(morseRecord);
-            morseRecord = '';
-
-            stopKeyUpTimer();
-        }
-
-    }, PAUSE);
 }
 
 function backspace() {
@@ -271,11 +284,6 @@ function parseLetter() {
     if (typeof letter == 'undefined') {
         letter = '*';
     }
-}
-
-function stopKeyUpTimer() {
-    clearInterval(intervalIdUp);
-    upTimerStarted = false;
 }
 
 function beepInit() {
