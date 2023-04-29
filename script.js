@@ -254,7 +254,7 @@ function buttonUp() {
 
     beepStop();
 
-    keyDown.stopTimer();
+    tick.keyDown.stopTimer();
 
     if (!tick.keyUp.timerStarted) {
         tick.keyUp.startTimer();
@@ -272,10 +272,12 @@ function buttonUp() {
 }
 
 function backspace() {
-    INPUT_ELEMENT.innerHTML = INPUT_ELEMENT.innerHTML.slice(0, -morseRecords[morseRecords.length - 1].length - 4);
-    morseRecords.pop();
-    OUTPUT_ELEMENT.innerHTML = OUTPUT_ELEMENT.innerHTML.slice(0, -letterRecords[letterRecords.length - 1].length - 1);
-    letterRecords.pop();
+    if (letterRecords.length != 0) {
+        INPUT_ELEMENT.innerHTML = INPUT_ELEMENT.innerHTML.slice(0, -morseRecords[morseRecords.length - 1].length - 4);
+        morseRecords.pop();
+        OUTPUT_ELEMENT.innerHTML = OUTPUT_ELEMENT.innerHTML.slice(0, -letterRecords[letterRecords.length - 1].length - 1);
+        letterRecords.pop();
+    }
 }
 
 function parseLetter() {
