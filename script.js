@@ -2,7 +2,7 @@ let signal; // signal sent (long or short)
 let letterMorse = ''; // letter sent (in morse code)
 let letter; // letter sent
 let keyPressed; // user key press
-let keyUpMode = false;  // false = check for letter, true = check for space
+let spaceOrChar = false;  // false = check for character, true = check for space
 let ac = new AudioContext(); // audio context
 let volume = 0.36; // audio volume
 let volumeDisplayed; // volumeDisplayed is converted from the actual volume, it gets displayed on the webpage
@@ -62,25 +62,23 @@ const tick = {
             this.intervalId = setInterval(function () {
                 tick.keyUp.value++;
 
-                if (!keyUpMode && tick.keyUp.value >= longMargin) {
+                if (!spaceOrChar && tick.keyUp.value >= longMargin) {
 
                     parseLetter();
-                    OUTPUT_ELEMENT.innerHTML += letter;
+                    printSpaceChar();
 
-                    letterRecord += letter;
-                    morseRecord += ' ';
-                    INPUT_ELEMENT.innerHTML += ' ';
+                    recordChar();
+
                     letterMorse = '';
-                    keyUpMode = true;
+                    spaceOrChar = true;
 
                     tick.keyUp.stopTimer();
                     tick.keyUp.startTimer();
 
-                } else if (keyUpMode && tick.keyUp.value >= spaceMargin) {
+                } else if (spaceOrChar && tick.keyUp.value >= spaceMargin) {
 
-                    OUTPUT_ELEMENT.innerHTML += ' ';
-                    INPUT_ELEMENT.innerHTML += ' / ';
-                    keyUpMode = false;
+                    printSpaceWord();
+                    spaceOrChar = false;
 
                     if (!easterEggPlayed) {
                         EASTER_EGG_TEXT.forEach(function (EASTER_EGG_STRING) {
@@ -101,11 +99,7 @@ const tick = {
                         });
                     }
 
-                    letterRecords.push(letterRecord);
-                    letterRecord = '';
-                    morseRecord = morseRecord.slice(0, -1);
-                    morseRecords.push(morseRecord);
-                    morseRecord = '';
+                    recordWord();
 
                     tick.keyUp.stopTimer();
                 }
@@ -128,7 +122,7 @@ const tick = {
         startTimer: function () {
             this.value = 0;
             this.intervalId = setInterval(function () {
-                tick.keyDown.value ++;
+                tick.keyDown.value++;
             }, tick.LENGTH);
             this.timerStarted = true;
         },
@@ -143,6 +137,12 @@ const tick = {
 }
 
 function initialise() {
+    assignElements();
+    populateMorseChart();
+    showHideChart();
+}
+
+function assignElements() {
     INPUT_ELEMENT = document.getElementById('input');
     OUTPUT_ELEMENT = document.getElementById('output');
     VOLUME_ELEMENT = document.getElementById('volume');
@@ -154,9 +154,10 @@ function initialise() {
     CHART_ELEMENT = document.getElementById('chart');
     LIST_LEFT_ELEMENT = document.getElementById('list-left');
     LIST_RIGHT_ELEMENT = document.getElementById('list-right');
-
     AMONG_US_ELEMENT = document.getElementById('among-us');
+}
 
+function populateMorseChart() {
     let morseCode = Object.keys(MORSE);
     let morseLetter = Object.values(MORSE);
     let linePos;
@@ -177,8 +178,6 @@ function initialise() {
         eachLine.textContent = morseLetter[i] + '  ' + morseCode[i];
         linePos.appendChild(eachLine);
     }
-
-    showHideChart();
 }
 
 function clearText() {
@@ -186,21 +185,54 @@ function clearText() {
     OUTPUT_ELEMENT.innerHTML = '';
 }
 
-document.addEventListener('keydown', function (event) {
+function printSpaceChar() {
+    INPUT_ELEMENT.innerHTML += ' ';
+    OUTPUT_ELEMENT.innerHTML += letter;
+}
 
-    keyPressed = event.key;
+function printSpaceWord() {
+    INPUT_ELEMENT.innerHTML += ' / ';
+    OUTPUT_ELEMENT.innerHTML += ' ';
+}
 
+function recordChar() {
+    letterRecord += letter;
+    morseRecord += ' ';
+}
+
+function recordWord() {
+    letterRecords.push(letterRecord);
+    letterRecord = '';
+
+    morseRecord = morseRecord.slice(0, -1);
+    morseRecords.push(morseRecord);
+    morseRecord = '';
+}
+
+function preventPageScrolling(event) {
     for (let i = 0; i < preventDefaultKeys.length; i++) {
         if (signalKey == preventDefaultKeys[i] && keyPressed == preventDefaultKeys[i]) {
             event.preventDefault();
         }
     }
+}
 
-    if (document.activeElement == SIGNAL_KEY_ELEMENT) {
-        event.preventDefault();
-        signalKeyChosen = keyPressed;
-        signalKeyText = event.code;
-        SIGNAL_KEY_ELEMENT.value = event.code;
+function changeKeyBind(event) {
+    event.preventDefault();
+    signalKeyChosen = keyPressed;
+    signalKeyText = event.code;
+    SIGNAL_KEY_ELEMENT.value = event.code;
+
+}
+
+document.addEventListener('keydown', function (event) {
+
+    keyPressed = event.key;
+
+    preventPageScrolling(event);
+
+    if (document.activeElement == SIGNAL_KEY_ELEMENT) { // if the pointer focuses on the keybind box in settings
+        changeKeyBind(event);
     }
 
     if (!event.repeat && keyPressed == signalKey) {
@@ -208,7 +240,7 @@ document.addEventListener('keydown', function (event) {
     }
 
     if (keyPressed == signalKey) {
-        keyUpMode = false;
+        spaceOrChar = false;
         tick.keyUp.stopTimer();
         if (!tick.keyDown.timerStarted) {
             tick.keyDown.startTimer();
@@ -220,7 +252,8 @@ function buttonDown() {
 
     beepStart();
 
-    keyUpMode = false;
+    spaceOrChar = false;
+    
     tick.keyUp.stopTimer();
     tick.keyDown.startTimer();
 }
