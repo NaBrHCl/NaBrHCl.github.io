@@ -15,7 +15,6 @@ body {
     top: 8vh;
     left: calc(20vw - 2%);
     width: 60vw;
-    height: 60vh;
     padding: 2%;
 }
 
@@ -29,7 +28,7 @@ body {
     margin: 0;
 }
 
-#settings form {
+#settings-form {
     padding: 8%;
 
     display: grid;
@@ -40,7 +39,7 @@ body {
     justify-items: center;
 }
 
-#settings form div {
+#settings-form div {
     width: 80%;
     display: flex;
     justify-content: space-around;

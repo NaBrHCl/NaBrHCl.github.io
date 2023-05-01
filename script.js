@@ -29,19 +29,9 @@ let signalKeyChosen; // the key for input that the user changes to in settings
 const VOLUME_RATIO = 100; // volumeDisplayed / volume
 const VOLUME_MIN = 0;
 const VOLUME_MAX = 100;
-const DIT_MIN = 1;
+const INSTRUCTIONS_TEXT = 'Instructions: Press SIGNAL_KEY or the button below to send signal';
 
 // elements that will be set once the body element loads
-
-let dit = 4; // time length unit
-
-// time length margin of short / long signal measured in milliseconds.
-// any signal shorter than this is a short signal, any signal longer than or equal to this is a long signal
-let longMargin = dit * 3;
-
-// time length margin of space signal measured in milliseconds.
-// if the key is released and the user doesn't press it within this time length, the signal will be considered as space
-let spaceMargin = dit * 7;
 
 beepInit();
 
@@ -49,6 +39,9 @@ let wholeList;
 let eachLine;
 
 const preventDefaultKeys = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown']; // if any of these keys is the signal key, when it's pressed, the page won't move
+
+// ================================================================================================================================
+// Objects
 
 const tick = {
 
@@ -62,7 +55,7 @@ const tick = {
             this.intervalId = setInterval(function () {
                 tick.keyUp.value++;
 
-                if (!spaceOrChar && tick.keyUp.value >= longMargin) {
+                if (!spaceOrChar && tick.keyUp.value >= dit.long) {
 
                     parseLetter();
                     printSpaceChar();
@@ -75,7 +68,7 @@ const tick = {
                     tick.keyUp.stopTimer();
                     tick.keyUp.startTimer();
 
-                } else if (spaceOrChar && tick.keyUp.value >= spaceMargin) {
+                } else if (spaceOrChar && tick.keyUp.value >= dit.space) {
 
                     printSpaceWord();
                     spaceOrChar = false;
@@ -136,10 +129,102 @@ const tick = {
     LENGTH: 10 // how frequently is each action performed, in milliseconds
 }
 
+
+
+const dit = {
+
+    value: 4,
+    long: null,
+    space: null,
+
+    update: function () {
+        this.long = this.value * this.TO_LONG;
+        this.space = this.value * this.TO_SPACE;
+    },
+
+    MIN: 1,
+    TO_LONG: 3,
+    TO_SPACE: 7
+}
+
+// ================================================================================================================================
+// Key Press
+
+document.addEventListener('keydown', function (event) {
+
+    keyPressed = event.key;
+
+    preventPageScrolling(event);
+
+    if (document.activeElement == SIGNAL_KEY_ELEMENT) { // if the pointer is focused on the keybind box in settings
+        changeKeyBind(event);
+    }
+
+    if (keyPressed == signalKey) {
+
+        if (!event.repeat) {
+            beepStart();
+        }
+
+        spaceOrChar = false;
+        tick.keyUp.stopTimer();
+        if (!tick.keyDown.timerStarted) {
+            tick.keyDown.startTimer();
+        }
+    }
+});
+
+function buttonDown() {
+
+    beepStart();
+
+    spaceOrChar = false;
+
+    tick.keyUp.stopTimer();
+    tick.keyDown.startTimer();
+}
+
+document.addEventListener('keyup', function () {
+
+    if (keyPressed == signalKey) {
+        tick.keyDown.stopTimer();
+
+        beepStop();
+
+        if (!tick.keyUp.timerStarted) {
+            tick.keyUp.startTimer();
+        }
+
+        setSignal();
+        recordSignal();
+    }
+});
+
+function buttonUp() {
+
+    tick.keyDown.stopTimer();
+
+    beepStop();
+
+    if (!tick.keyUp.timerStarted) {
+        tick.keyUp.startTimer();
+    }
+
+    setSignal();
+    recordSignal();
+}
+
+
+// ================================================================================================================================
+// Functions
+
 function initialise() {
     assignElements();
     populateMorseChart();
     showHideChart();
+    dit.update();
+
+    INSTRUCTIONS_ELEMENT.innerHTML = INSTRUCTIONS_TEXT.replace('SIGNAL_KEY', signalKeyText);
 }
 
 function assignElements() {
@@ -209,6 +294,20 @@ function recordWord() {
     morseRecord = '';
 }
 
+function setSignal() {
+    if (tick.keyDown.value >= dit.long) {
+        signal = '-';
+    } else {
+        signal = '.';
+    }
+}
+
+function recordSignal() {
+    INPUT_ELEMENT.innerHTML += signal;
+    letterMorse += signal;
+    morseRecord += signal;
+}
+
 function preventPageScrolling(event) {
     for (let i = 0; i < preventDefaultKeys.length; i++) {
         if (signalKey == preventDefaultKeys[i] && keyPressed == preventDefaultKeys[i]) {
@@ -222,86 +321,6 @@ function changeKeyBind(event) {
     signalKeyChosen = keyPressed;
     signalKeyText = event.code;
     SIGNAL_KEY_ELEMENT.value = event.code;
-
-}
-
-document.addEventListener('keydown', function (event) {
-
-    keyPressed = event.key;
-
-    preventPageScrolling(event);
-
-    if (document.activeElement == SIGNAL_KEY_ELEMENT) { // if the pointer focuses on the keybind box in settings
-        changeKeyBind(event);
-    }
-
-    if (!event.repeat && keyPressed == signalKey) {
-        beepStart();
-    }
-
-    if (keyPressed == signalKey) {
-        spaceOrChar = false;
-        tick.keyUp.stopTimer();
-        if (!tick.keyDown.timerStarted) {
-            tick.keyDown.startTimer();
-        }
-    }
-});
-
-function buttonDown() {
-
-    beepStart();
-
-    spaceOrChar = false;
-    
-    tick.keyUp.stopTimer();
-    tick.keyDown.startTimer();
-}
-
-document.addEventListener('keyup', function () {
-
-    if (keyPressed == signalKey) {
-        beepStop();
-    }
-
-    tick.keyDown.stopTimer();
-
-    if (keyPressed == signalKey) {
-        if (!tick.keyUp.timerStarted) {
-            tick.keyUp.startTimer();
-        }
-
-        if (tick.keyDown.value >= longMargin) {
-            signal = '-';
-        } else {
-            signal = '.';
-        }
-
-        INPUT_ELEMENT.innerHTML += signal;
-        morseRecord += signal;
-        letterMorse += signal;
-    }
-});
-
-function buttonUp() {
-
-    beepStop();
-
-    tick.keyDown.stopTimer();
-
-    if (!tick.keyUp.timerStarted) {
-        tick.keyUp.startTimer();
-    }
-
-    if (tick.keyDown.value >= longMargin) {
-        signal = '-';
-    } else {
-        signal = '.';
-    }
-
-    INPUT_ELEMENT.innerHTML += signal;
-    letterMorse += signal;
-    morseRecord += signal;
 }
 
 function backspace() {
@@ -316,7 +335,7 @@ function backspace() {
 function parseLetter() {
     letter = MORSE[letterMorse];
 
-    if (typeof letter == 'undefined') {
+    if (letter === undefined) {
         letter = '*';
     }
 }
@@ -339,20 +358,23 @@ async function beepStop() {
 }
 
 function displaySettings() {
+    // show settings pannel
     SETTINGS_ELEMENT.style.display = 'block';
     OPEN_SETTINGS_ELEMENT.style.display = 'none';
 
+    // show current property values
     updateVolume();
     VOLUME_ELEMENT.value = volumeDisplayed;
-    DIT_ELEMENT.value = dit;
+    DIT_ELEMENT.value = dit.value;
     SIGNAL_KEY_ELEMENT.value = signalKeyText;
 
-    VOLUME_ELEMENT.setAttribute('min', 0);
-    VOLUME_ELEMENT.setAttribute('max', 100);
+    // set input attributes
+    VOLUME_ELEMENT.setAttribute('min', VOLUME_MIN);
+    VOLUME_ELEMENT.setAttribute('max', VOLUME_MAX);
     VOLUME_ELEMENT.setAttribute('step', 1);
-    DIT_ELEMENT.setAttribute('min', 1);
+    DIT_ELEMENT.setAttribute('min', dit.MIN);
 
-    signalKeyChosen = signalKey;
+    // signalKeyChosen = signalKey;
 }
 
 function hideSettings() {
@@ -362,25 +384,35 @@ function hideSettings() {
 
 function updateVolume(mode) {
     if (mode) {
-        volume = VOLUME_ELEMENT.value / VOLUME_RATIO;
-    } else {
+        volume = VOLUME_ELEMENT.value / VOLUME_RATIO; // update actual volume
+    } else { // update displayed volume
         volumeDisplayed = volume * VOLUME_RATIO;
     }
 }
 
 function updateSettings(event) {
     event.preventDefault();
+
+    // update volume
     updateVolume(true);
     beepInit();
-    dit = DIT_ELEMENT.value;
-    longMargin = dit * 3;
-    spaceMargin = dit * 7;
 
-    signalKey = signalKeyChosen;
+    // update dit
+    dit.value = DIT_ELEMENT.value;
+    dit.long = dit.value * dit.TO_LONG;
+    dit.space = dit.value * dit.TO_SPACE;
 
+    // update signal key
+    if (signalKeyChosen !== undefined) {
+        signalKey = signalKeyChosen;
+    }
+
+    // update morse chart
     showHideChart();
 
-    INSTRUCTIONS_ELEMENT.innerHTML = 'Instructions: Press ' + signalKeyText + ' or the button below to send signal';
+    // update instructions
+    INSTRUCTIONS_ELEMENT.innerHTML = INSTRUCTIONS_TEXT.replace('SIGNAL_KEY', signalKeyText);
+
     hideSettings();
 }
 
@@ -393,6 +425,9 @@ function showHideChart() {
         LIST_RIGHT_ELEMENT.style.visibility = 'hidden';
     }
 }
+
+// ================================================================================================================================
+// Morse to Letter Chart
 
 const MORSE = {
     '.-': 'A',
