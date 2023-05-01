@@ -137,14 +137,7 @@ const easterEgg = {
     played: false,
 
     keywordFound: function () {
-
-        this.KEYWORDS.forEach(function (KEYWORD) {
-            if (letterRecord == KEYWORD) {
-                return true;
-            }
-        });
-
-        return false;
+        return (this.KEYWORDS.includes(letterRecord));
     },
 
     play: function () {
@@ -167,7 +160,6 @@ const easterEgg = {
                 easterEgg.crewmate.pos += easterEgg.crewmate.POS_INCREMENT;
                 AMONG_US_ELEMENT.style.left = easterEgg.crewmate.pos + easterEgg.crewmate.POS_UNIT;
                 easterEgg.crewmate.i++;
-                console.log(easterEgg.crewmate.i);
 
                 if (easterEgg.crewmate.i == easterEgg.crewmate.ITERATION_MAX) {
                     AMONG_US_ELEMENT.style.display = 'none';
