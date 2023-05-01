@@ -11,13 +11,6 @@ let morseRecord = ''; // record of current input word in morse code
 let letterRecords = []; // record of input words in letter
 let morseRecords = []; // record of input words in morse code
 
-let easterEggPlayed = false; // easter egg will only play once
-let amongUsPos = 0; // position of among us picture
-let easterEggIteration = 0;
-let intervalEasterEgg;
-const EASTER_EGG_TEXT = ['AMONGUS', 'AMOGUS']; // if any of 
-const sus = new Audio('./assets/among-us-role-reveal.mp3');
-
 let gn = ac.createGain(); // gain node
 gn.gain.value = volume; // volume
 gn.connect(ac.destination);
@@ -47,12 +40,14 @@ const tick = {
 
     keyUp: {
         value: 0,
-        intervalId: 0,
+        intervalId: null,
         timerStarted: false,
+
         startTimer: function () {
             this.value = 0;
 
             this.intervalId = setInterval(function () {
+
                 tick.keyUp.value++;
 
                 if (!spaceOrChar && tick.keyUp.value >= dit.long) {
@@ -73,23 +68,8 @@ const tick = {
                     printSpaceWord();
                     spaceOrChar = false;
 
-                    if (!easterEggPlayed) {
-                        EASTER_EGG_TEXT.forEach(function (EASTER_EGG_STRING) {
-                            if (letterRecord == EASTER_EGG_STRING) {
-                                sus.play();
-                                easterEggPlayed = true;
-                                AMONG_US_ELEMENT.style.display = 'block';
-                                intervalEasterEgg = setInterval(function () {
-                                    amongUsPos += 2;
-                                    AMONG_US_ELEMENT.style.left = amongUsPos + 'vw';
-                                    easterEggIteration++;
-                                    if (easterEggIteration == 50) {
-                                        clearInterval(intervalEasterEgg);
-                                        AMONG_US_ELEMENT.style.display = 'none';
-                                    }
-                                }, tick.LENGTH);
-                            }
-                        });
+                    if (!easterEgg.played && easterEgg.keywordFound()) {
+                        easterEgg.play();
                     }
 
                     recordWord();
@@ -102,6 +82,7 @@ const tick = {
             this.timerStarted = true;
 
         },
+
         stopTimer: function () {
             clearInterval(this.intervalId);
             this.timerStarted = false;
@@ -110,8 +91,9 @@ const tick = {
 
     keyDown: {
         value: 0,
-        intervalId: 0,
+        intervalId: null,
         timerStarted: false,
+
         startTimer: function () {
             this.value = 0;
             this.intervalId = setInterval(function () {
@@ -119,6 +101,7 @@ const tick = {
             }, tick.LENGTH);
             this.timerStarted = true;
         },
+
         stopTimer: function () {
             clearInterval(this.intervalId);
             this.timerStarted = false;
@@ -145,6 +128,63 @@ const dit = {
     MIN: 1,
     TO_LONG: 3,
     TO_SPACE: 7
+}
+
+
+
+const easterEgg = {
+
+    played: false,
+
+    keywordFound: function () {
+
+        this.KEYWORDS.forEach(function (KEYWORD) {
+            if (letterRecord == KEYWORD) {
+                return true;
+            }
+        });
+
+        return false;
+    },
+
+    play: function () {
+        this.played = true;
+        this.SFX.play();
+        this.crewmate.display();
+
+    },
+
+    crewmate: {
+        pos: 0,
+        intervalId: null,
+        i: 0,
+
+        display: function () {
+            AMONG_US_ELEMENT.style.display = 'block';
+
+            this.intervalId = setInterval(function () {
+
+                easterEgg.crewmate.pos += easterEgg.crewmate.POS_INCREMENT;
+                AMONG_US_ELEMENT.style.left = easterEgg.crewmate.pos + easterEgg.crewmate.POS_UNIT;
+                easterEgg.crewmate.i++;
+                console.log(easterEgg.crewmate.i);
+
+                if (easterEgg.crewmate.i == easterEgg.crewmate.ITERATION_MAX) {
+                    AMONG_US_ELEMENT.style.display = 'none';
+                    clearInterval(easterEgg.crewmate.intervalId);
+                }
+
+            }, tick.LENGTH);
+
+        },
+
+        POS_UNIT: 'vw',
+        POS_INCREMENT: 2,
+        ITERATION_MAX: 50,
+    },
+
+    SFX: new Audio('./assets/among-us-role-reveal.mp3'),
+    KEYWORDS: ['AMONGUS', 'AMOGUS']
 }
 
 // ================================================================================================================================
