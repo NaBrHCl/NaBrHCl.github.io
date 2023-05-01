@@ -10,6 +10,7 @@ let letterRecord = ''; // record of current input word in letter
 let morseRecord = ''; // record of current input word in morse code
 let letterRecords = []; // record of input words in letter
 let morseRecords = []; // record of input words in morse code
+let keybindModified; // check if keybind is changed after the settings pannel is open
 
 let gn = ac.createGain(); // gain node
 gn.gain.value = volume; // volume
@@ -188,8 +189,15 @@ document.addEventListener('keydown', function (event) {
 
     preventPageScrolling(event);
 
-    if (document.activeElement == SIGNAL_KEY_ELEMENT) { // if the pointer is focused on the keybind box in settings
-        changeKeyBind(event);
+    // if the pointer is focused on the keybind box in settings
+    if (document.activeElement == SIGNAL_KEY_ELEMENT) {
+        console.log(keybindModified);
+        if (keyPressed == 'Enter' && keybindModified) {
+            updateSettings(event);
+        } else {
+            keybindModified = true;
+            changeKeyBind(event);
+        }
     }
 
     if (keyPressed == signalKey) {
@@ -406,7 +414,7 @@ function displaySettings() {
     VOLUME_ELEMENT.setAttribute('step', 1);
     DIT_ELEMENT.setAttribute('min', dit.MIN);
 
-    // signalKeyChosen = signalKey;
+    keybindModified = false;
 }
 
 function hideSettings() {
