@@ -1,6 +1,10 @@
+html {
+    height: 20vh;
+}
+
 body {
     margin: 0 2vw;
-    padding: 0 4vw 100vh;
+    padding: 0 4vw 4vh;
 
     display: flex;
     justify-content: space-between;
@@ -144,7 +148,7 @@ button {
 @media only screen and (min-width: 1200px) {
     body {
         margin: 0 6vw;
-        padding: 2vh 10vw 100vh;
+        padding: 2vh 10vw 4vh;
     }
 
     button:hover {
