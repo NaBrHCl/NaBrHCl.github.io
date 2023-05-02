@@ -3,34 +3,21 @@ let letterMorse = ''; // letter sent (in morse code)
 let letter; // letter sent
 let keyPressed; // user key press
 let spaceOrChar = false;  // false = check for character, true = check for space
-let ac = new AudioContext(); // audio context
-let volume = 0.36; // audio volume
-let volumeDisplayed; // volumeDisplayed is converted from the actual volume, it gets displayed on the webpage
 let letterRecord = ''; // record of current input word in letter
 let morseRecord = ''; // record of current input word in morse code
 let letterRecords = []; // record of input words in letter
 let morseRecords = []; // record of input words in morse code
 let keybindModified; // check if keybind is changed after the settings pannel is open
+let settingsOpen = false;
 
-let gn = ac.createGain(); // gain node
-gn.gain.value = volume; // volume
-gn.connect(ac.destination);
-
-let beep; // oscillator
 let signalKey = 'c'; // the key for input, the program only reacts to this key
 let signalKeyText = 'KeyC'; // what the signal key is called, in plain text
 let signalKeyChosen; // the key for input that the user changes to in settings
-const VOLUME_RATIO = 100; // volumeDisplayed / volume
-const VOLUME_MIN = 0;
-const VOLUME_MAX = 100;
 const INSTRUCTIONS_TEXT = 'Instructions: Press SIGNAL_KEY or the button below to send signal';
-
-// elements that will be set once the body element loads
-
-beepInit();
-
-let wholeList;
-let eachLine;
+const ESCAPE_KEY = 'Escape'; // used for exiting settings without saving
+const ENTER_KEY = 'Enter'; // used for exiting settings and saving
+const CLEAR_TEXT_KEY = 'Delete';
+const BACKSPACE_KEY = 'Backspace';
 
 const preventDefaultKeys = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown']; // if any of these keys is the signal key, when it's pressed, the page won't move
 
@@ -180,6 +167,57 @@ const easterEgg = {
     KEYWORDS: ['AMONGUS', 'AMOGUS']
 }
 
+
+
+const beep = {
+
+    ac: new AudioContext(),
+    gn: null,
+    oscillator: null,
+
+    init: function () {
+        this.gn = this.ac.createGain();
+        this.gn.gain.value = this.volume.value;
+        this.gn.connect(this.ac.destination);
+
+        this.oscillator = this.ac.createOscillator();
+        this.oscillator.type = 'sine';
+        this.oscillator.frequency.value = 800;
+        this.oscillator.connect(this.gn).connect(this.ac.destination);
+    },
+
+    start: async function () {
+        this.oscillator = this.ac.createOscillator();
+        this.oscillator.type = 'sine';
+        this.oscillator.frequency.value = 800;
+        this.oscillator.connect(this.gn).connect(this.ac.destination);
+        this.oscillator.start();
+    },
+
+    stop: async function () {
+        this.oscillator.stop();
+    },
+
+    volume: {
+        value: 0.36,
+        displayed: null,
+        RATIO: 100,
+        MIN: 0,
+        MAX: 100,
+
+        updateActual: function () {
+            this.value = VOLUME_ELEMENT.value / this.RATIO;
+            beep.gn.gain.value = this.value;
+        },
+
+        updateDisplayed: function () {
+            this.displayed = this.value * this.RATIO;
+        }
+    }
+}
+
+
+
 // ================================================================================================================================
 // Key Press
 
@@ -191,19 +229,31 @@ document.addEventListener('keydown', function (event) {
 
     // if the pointer is focused on the keybind box in settings
     if (document.activeElement == SIGNAL_KEY_ELEMENT) {
-        console.log(keybindModified);
-        if (keyPressed == 'Enter' && keybindModified) {
+        if (keyPressed == ENTER_KEY && keybindModified) {
             updateSettings(event);
-        } else {
-            keybindModified = true;
+        } else if (keyPressed != ESCAPE_KEY) {
             changeKeyBind(event);
+        }
+    } else {
+        if (settingsOpen) {
+            if (keyPressed == ENTER_KEY) {
+                updateSettings(event);
+            } else if (keyPressed == ESCAPE_KEY) {
+                hideSettings();
+            }
+        } else {
+            if (keyPressed == CLEAR_TEXT_KEY) {
+                clearText();
+            } else if (keyPressed == BACKSPACE_KEY) {
+                backspace();
+            }
         }
     }
 
     if (keyPressed == signalKey) {
 
         if (!event.repeat) {
-            beepStart();
+            beep.start();
         }
 
         spaceOrChar = false;
@@ -216,7 +266,7 @@ document.addEventListener('keydown', function (event) {
 
 function buttonDown() {
 
-    beepStart();
+    beep.start();
 
     spaceOrChar = false;
 
@@ -229,7 +279,7 @@ document.addEventListener('keyup', function () {
     if (keyPressed == signalKey) {
         tick.keyDown.stopTimer();
 
-        beepStop();
+        beep.stop();
 
         if (!tick.keyUp.timerStarted) {
             tick.keyUp.startTimer();
@@ -244,7 +294,7 @@ function buttonUp() {
 
     tick.keyDown.stopTimer();
 
-    beepStop();
+    beep.stop();
 
     if (!tick.keyUp.timerStarted) {
         tick.keyUp.startTimer();
@@ -263,6 +313,7 @@ function initialise() {
     populateMorseChart();
     showHideChart();
     dit.update();
+    beep.init();
 
     INSTRUCTIONS_ELEMENT.innerHTML = INSTRUCTIONS_TEXT.replace('SIGNAL_KEY', signalKeyText);
 }
@@ -361,6 +412,7 @@ function changeKeyBind(event) {
     signalKeyChosen = keyPressed;
     signalKeyText = event.code;
     SIGNAL_KEY_ELEMENT.value = event.code;
+    keybindModified = true;
 }
 
 function backspace() {
@@ -380,67 +432,44 @@ function parseLetter() {
     }
 }
 
-function beepInit() {
-    beep = ac.createOscillator();
-    beep.type = 'sine';
-    beep.frequency.value = 800;
-    gn.gain.value = volume;
-    beep.connect(gn).connect(ac.destination);
-}
-
-async function beepStart() {
-    beep.start();
-}
-
-async function beepStop() {
-    beep.stop();
-    beepInit();
-}
-
 function displaySettings() {
     // show settings pannel
     SETTINGS_ELEMENT.style.display = 'block';
     OPEN_SETTINGS_ELEMENT.style.display = 'none';
 
     // show current property values
-    updateVolume();
-    VOLUME_ELEMENT.value = volumeDisplayed;
+    beep.volume.updateDisplayed();
+    VOLUME_ELEMENT.value = beep.volume.displayed;
     DIT_ELEMENT.value = dit.value;
     SIGNAL_KEY_ELEMENT.value = signalKeyText;
 
     // set input attributes
-    VOLUME_ELEMENT.setAttribute('min', VOLUME_MIN);
-    VOLUME_ELEMENT.setAttribute('max', VOLUME_MAX);
+    VOLUME_ELEMENT.setAttribute('min', beep.volume.MIN);
+    VOLUME_ELEMENT.setAttribute('max', beep.volume.MAX);
     VOLUME_ELEMENT.setAttribute('step', 1);
     DIT_ELEMENT.setAttribute('min', dit.MIN);
 
     keybindModified = false;
+    settingsOpen = true;
 }
 
 function hideSettings() {
     SETTINGS_ELEMENT.style.display = 'none';
     OPEN_SETTINGS_ELEMENT.style.display = 'block';
-}
 
-function updateVolume(mode) {
-    if (mode) {
-        volume = VOLUME_ELEMENT.value / VOLUME_RATIO; // update actual volume
-    } else { // update displayed volume
-        volumeDisplayed = volume * VOLUME_RATIO;
-    }
+    settingsOpen = false;
 }
 
 function updateSettings(event) {
+
     event.preventDefault();
 
     // update volume
-    updateVolume(true);
-    beepInit();
+    beep.volume.updateActual();
 
     // update dit
     dit.value = DIT_ELEMENT.value;
-    dit.long = dit.value * dit.TO_LONG;
-    dit.space = dit.value * dit.TO_SPACE;
+    dit.update();
 
     // update signal key
     if (signalKeyChosen !== undefined) {
