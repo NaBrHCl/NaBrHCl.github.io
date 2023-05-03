@@ -7,11 +7,7 @@ let letterRecord = ''; // record of current input word in letter
 let morseRecord = ''; // record of current input word in morse code
 let letterRecords = []; // record of input words in letter
 let morseRecords = []; // record of input words in morse code
-let keybindModified; // check if keybind is changed after the settings pannel is open
 
-let signalKey = 'c'; // the key for input, the program only reacts to this key
-let signalKeyText = 'KeyC'; // what the signal key is called, in plain text
-let signalKeyChosen; // the key for input that the user changes to in settings
 const INSTRUCTIONS_TEXT = 'Instructions: Press SIGNAL_KEY or the button below to send signal';
 const ESCAPE_KEY = 'Escape'; // used for exiting settings without saving
 const ENTER_KEY = 'Enter'; // used for exiting settings and saving
@@ -228,53 +224,71 @@ const settings = {
 
         // update volume
         beep.volume.updateActual();
-    
+
         // update dit
         dit.value = DIT_ELEMENT.value;
         dit.update();
-    
+
         // update signal key
-        if (signalKeyChosen !== undefined) {
-            signalKey = signalKeyChosen;
+        if (signalKey.selected !== undefined) {
+            signalKey.value = signalKey.selected;
         }
-    
+
         // update morse chart
         showHideChart();
-    
+
         // update instructions
-        INSTRUCTIONS_ELEMENT.innerHTML = INSTRUCTIONS_TEXT.replace('SIGNAL_KEY', signalKeyText);
-    
+        INSTRUCTIONS_ELEMENT.innerHTML = INSTRUCTIONS_TEXT.replace('SIGNAL_KEY', signalKey.text);
+
         this.hide();
-    
+
     },
 
     display: function () {
 
-    // show settings pannel
-    SETTINGS_ELEMENT.style.display = 'block';
-    OPEN_SETTINGS_ELEMENT.style.display = 'none';
+        // show settings pannel
+        SETTINGS_ELEMENT.style.display = 'block';
+        OPEN_SETTINGS_ELEMENT.style.display = 'none';
 
-    // show current property values
-    beep.volume.updateDisplayed();
-    VOLUME_ELEMENT.value = beep.volume.displayed;
-    DIT_ELEMENT.value = dit.value;
-    SIGNAL_KEY_ELEMENT.value = signalKeyText;
+        // show current property values
+        beep.volume.updateDisplayed();
+        VOLUME_ELEMENT.value = beep.volume.displayed;
+        DIT_ELEMENT.value = dit.value;
+        SIGNAL_KEY_ELEMENT.value = signalKey.text;
 
-    // set input attributes
-    VOLUME_ELEMENT.setAttribute('min', beep.volume.MIN);
-    VOLUME_ELEMENT.setAttribute('max', beep.volume.MAX);
-    VOLUME_ELEMENT.setAttribute('step', 1);
-    DIT_ELEMENT.setAttribute('min', dit.MIN);
+        // set input attributes
+        VOLUME_ELEMENT.setAttribute('min', beep.volume.MIN);
+        VOLUME_ELEMENT.setAttribute('max', beep.volume.MAX);
+        VOLUME_ELEMENT.setAttribute('step', 1);
+        DIT_ELEMENT.setAttribute('min', dit.MIN);
 
-    keybindModified = false;
-    this.open = true;
+        signalKey.modified = false;
+        this.open = true;
     },
 
     hide: function () {
         SETTINGS_ELEMENT.style.display = 'none';
         OPEN_SETTINGS_ELEMENT.style.display = 'block';
-    
-        this.open = false;    
+
+        this.open = false;
+    }
+}
+
+
+
+const signalKey = {
+
+    value: 'c',
+    text: 'KeyC',
+    selected: null,
+    modified: null,
+
+    change: function (event) {
+        event.preventDefault();
+        this.selected = keyPressed;
+        this.text = event.code;
+        SIGNAL_KEY_ELEMENT.value = this.text;
+        this.modified = true;
     }
 }
 
@@ -289,12 +303,16 @@ document.addEventListener('keydown', function (event) {
 
     preventPageScrolling(event);
 
+    // "refactor nested if/else" javascript
+    // programming by intention javascript
+    // 
+
     // if the pointer is focused on the keybind box in settings
     if (document.activeElement == SIGNAL_KEY_ELEMENT) {
-        if (keyPressed == ENTER_KEY && keybindModified) {
+        if (keyPressed == ENTER_KEY && signalKey.modified) {
             settings.update(event);
         } else if (keyPressed != ESCAPE_KEY) {
-            changeKeyBind(event);
+            signalKey.change(event);
         }
     } else {
         if (settings.open) {
@@ -312,7 +330,7 @@ document.addEventListener('keydown', function (event) {
         }
     }
 
-    if (keyPressed == signalKey) {
+    if (keyPressed == signalKey.value) {
 
         if (!event.repeat) {
             beep.start();
@@ -338,7 +356,7 @@ function buttonDown() {
 
 document.addEventListener('keyup', function () {
 
-    if (keyPressed == signalKey) {
+    if (keyPressed == signalKey.value) {
         tick.keyDown.stopTimer();
 
         beep.stop();
@@ -377,7 +395,7 @@ function initialise() {
     dit.update();
     beep.init();
 
-    INSTRUCTIONS_ELEMENT.innerHTML = INSTRUCTIONS_TEXT.replace('SIGNAL_KEY', signalKeyText);
+    INSTRUCTIONS_ELEMENT.innerHTML = INSTRUCTIONS_TEXT.replace('SIGNAL_KEY', signalKey.text);
 }
 
 function assignElements() {
@@ -463,18 +481,10 @@ function recordSignal() {
 
 function preventPageScrolling(event) {
     for (let i = 0; i < preventDefaultKeys.length; i++) {
-        if (signalKey == preventDefaultKeys[i] && keyPressed == preventDefaultKeys[i]) {
+        if (signalKey.value == preventDefaultKeys[i] && keyPressed == preventDefaultKeys[i]) {
             event.preventDefault();
         }
     }
-}
-
-function changeKeyBind(event) {
-    event.preventDefault();
-    signalKeyChosen = keyPressed;
-    signalKeyText = event.code;
-    SIGNAL_KEY_ELEMENT.value = event.code;
-    keybindModified = true;
 }
 
 function backspace() {
