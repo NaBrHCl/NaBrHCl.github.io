@@ -22,7 +22,7 @@
             <div id="settings-head">
                 <div></div>
                 <h2>Settings</h2>
-                <button id="close-settings" class="svg-btn" onclick="hideSettings();">
+                <button id="close-settings" class="svg-btn" onclick="settings.hide();">
                     <svg xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 384 512"><!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                         <path
@@ -30,7 +30,7 @@
                     </svg>
                 </button>
             </div>
-            <form onsubmit="updateSettings(event);" autocomplete="off" id="settings-form">
+            <form onsubmit="settings.update(event);" autocomplete="off" id="settings-form">
                 <div>Volume <input type="number" id="volume">
                     <br>Goes from 0 to 100, integer only, controls the sound level / volume
                 </div>
@@ -51,7 +51,7 @@
             <div>
                 <button onclick="clearText();" title="Clear Text (del)">Clear Text</button>
                 <button onclick="backspace();" title="Backspace (⌫)">Backspace</button>
-                <button id="open-settings" class="svg-btn" onclick="displaySettings();">
+                <button id="open-settings" class="svg-btn" onclick="settings.display();">
                     <svg xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 512 512"><!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                         <path

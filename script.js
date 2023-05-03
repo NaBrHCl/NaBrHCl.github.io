@@ -8,7 +8,6 @@ let morseRecord = ''; // record of current input word in morse code
 let letterRecords = []; // record of input words in letter
 let morseRecords = []; // record of input words in morse code
 let keybindModified; // check if keybind is changed after the settings pannel is open
-let settingsOpen = false;
 
 let signalKey = 'c'; // the key for input, the program only reacts to this key
 let signalKeyText = 'KeyC'; // what the signal key is called, in plain text
@@ -201,9 +200,6 @@ const beep = {
     volume: {
         value: 0.36,
         displayed: null,
-        RATIO: 100,
-        MIN: 0,
-        MAX: 100,
 
         updateActual: function () {
             this.value = VOLUME_ELEMENT.value / this.RATIO;
@@ -212,7 +208,73 @@ const beep = {
 
         updateDisplayed: function () {
             this.displayed = this.value * this.RATIO;
+        },
+
+        RATIO: 100,
+        MIN: 0,
+        MAX: 100
+    }
+}
+
+
+
+const settings = {
+
+    open: false,
+
+    update: function (event) {
+
+        event.preventDefault();
+
+        // update volume
+        beep.volume.updateActual();
+    
+        // update dit
+        dit.value = DIT_ELEMENT.value;
+        dit.update();
+    
+        // update signal key
+        if (signalKeyChosen !== undefined) {
+            signalKey = signalKeyChosen;
         }
+    
+        // update morse chart
+        showHideChart();
+    
+        // update instructions
+        INSTRUCTIONS_ELEMENT.innerHTML = INSTRUCTIONS_TEXT.replace('SIGNAL_KEY', signalKeyText);
+    
+        this.hide();
+    
+    },
+
+    display: function () {
+
+    // show settings pannel
+    SETTINGS_ELEMENT.style.display = 'block';
+    OPEN_SETTINGS_ELEMENT.style.display = 'none';
+
+    // show current property values
+    beep.volume.updateDisplayed();
+    VOLUME_ELEMENT.value = beep.volume.displayed;
+    DIT_ELEMENT.value = dit.value;
+    SIGNAL_KEY_ELEMENT.value = signalKeyText;
+
+    // set input attributes
+    VOLUME_ELEMENT.setAttribute('min', beep.volume.MIN);
+    VOLUME_ELEMENT.setAttribute('max', beep.volume.MAX);
+    VOLUME_ELEMENT.setAttribute('step', 1);
+    DIT_ELEMENT.setAttribute('min', dit.MIN);
+
+    keybindModified = false;
+    this.open = true;
+    },
+
+    hide: function () {
+        SETTINGS_ELEMENT.style.display = 'none';
+        OPEN_SETTINGS_ELEMENT.style.display = 'block';
+    
+        this.open = false;    
     }
 }
 
@@ -230,16 +292,16 @@ document.addEventListener('keydown', function (event) {
     // if the pointer is focused on the keybind box in settings
     if (document.activeElement == SIGNAL_KEY_ELEMENT) {
         if (keyPressed == ENTER_KEY && keybindModified) {
-            updateSettings(event);
+            settings.update(event);
         } else if (keyPressed != ESCAPE_KEY) {
             changeKeyBind(event);
         }
     } else {
-        if (settingsOpen) {
+        if (settings.open) {
             if (keyPressed == ENTER_KEY) {
-                updateSettings(event);
+                settings.update(event);
             } else if (keyPressed == ESCAPE_KEY) {
-                hideSettings();
+                settings.hide();
             }
         } else {
             if (keyPressed == CLEAR_TEXT_KEY) {
@@ -430,59 +492,6 @@ function parseLetter() {
     if (letter === undefined) {
         letter = '*';
     }
-}
-
-function displaySettings() {
-    // show settings pannel
-    SETTINGS_ELEMENT.style.display = 'block';
-    OPEN_SETTINGS_ELEMENT.style.display = 'none';
-
-    // show current property values
-    beep.volume.updateDisplayed();
-    VOLUME_ELEMENT.value = beep.volume.displayed;
-    DIT_ELEMENT.value = dit.value;
-    SIGNAL_KEY_ELEMENT.value = signalKeyText;
-
-    // set input attributes
-    VOLUME_ELEMENT.setAttribute('min', beep.volume.MIN);
-    VOLUME_ELEMENT.setAttribute('max', beep.volume.MAX);
-    VOLUME_ELEMENT.setAttribute('step', 1);
-    DIT_ELEMENT.setAttribute('min', dit.MIN);
-
-    keybindModified = false;
-    settingsOpen = true;
-}
-
-function hideSettings() {
-    SETTINGS_ELEMENT.style.display = 'none';
-    OPEN_SETTINGS_ELEMENT.style.display = 'block';
-
-    settingsOpen = false;
-}
-
-function updateSettings(event) {
-
-    event.preventDefault();
-
-    // update volume
-    beep.volume.updateActual();
-
-    // update dit
-    dit.value = DIT_ELEMENT.value;
-    dit.update();
-
-    // update signal key
-    if (signalKeyChosen !== undefined) {
-        signalKey = signalKeyChosen;
-    }
-
-    // update morse chart
-    showHideChart();
-
-    // update instructions
-    INSTRUCTIONS_ELEMENT.innerHTML = INSTRUCTIONS_TEXT.replace('SIGNAL_KEY', signalKeyText);
-
-    hideSettings();
 }
 
 function showHideChart() {
