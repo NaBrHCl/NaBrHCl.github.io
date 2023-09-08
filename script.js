@@ -326,20 +326,19 @@ document.addEventListener('keydown', function (event) {
                 clearText();
             } else if (keyPressed == BACKSPACE_KEY) {
                 backspace();
+            } else if (keyPressed == signalKey.value) {
+
+                if (!event.repeat) {
+                    beep.start();
+                }
+
+                spaceOrChar = false;
+                
+                tick.keyUp.stopTimer();
+                if (!tick.keyDown.timerStarted) {
+                    tick.keyDown.startTimer();
+                }
             }
-        }
-    }
-
-    if (keyPressed == signalKey.value) {
-
-        if (!event.repeat) {
-            beep.start();
-        }
-
-        spaceOrChar = false;
-        tick.keyUp.stopTimer();
-        if (!tick.keyDown.timerStarted) {
-            tick.keyDown.startTimer();
         }
     }
 });
