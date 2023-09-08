@@ -92,20 +92,20 @@ const tick = {
 
     },
 
-    LENGTH: 10 // how frequently is each action performed, in milliseconds
+    LENGTH: 10 // how frequently each action is performed, in milliseconds
 }
 
 
 
 const dit = {
 
-    value: 4,
+    wpm: 24,
     long: null,
     space: null,
 
     update: function () {
-        this.long = this.value * this.TO_LONG;
-        this.space = this.value * this.TO_SPACE;
+        this.long = (1000 / tick.LENGTH) * this.TO_LONG * (6/5) / this.wpm;
+        this.space = (1000 / tick.LENGTH) * this.TO_SPACE * (6/5) / this.wpm;
     },
 
     MIN: 1,
@@ -226,11 +226,11 @@ const settings = {
         beep.volume.updateActual();
 
         // update dit
-        dit.value = DIT_ELEMENT.value;
+        dit.wpm = WPM_ELEMENT.value;
         dit.update();
 
         // update signal key
-        if (signalKey.selected !== undefined) {
+        if (signalKey.selected !== null) {
             signalKey.value = signalKey.selected;
         }
 
@@ -253,14 +253,14 @@ const settings = {
         // show current property values
         beep.volume.updateDisplayed();
         VOLUME_ELEMENT.value = beep.volume.displayed;
-        DIT_ELEMENT.value = dit.value;
+        WPM_ELEMENT.value = dit.wpm;
         SIGNAL_KEY_ELEMENT.value = signalKey.text;
 
         // set input attributes
         VOLUME_ELEMENT.setAttribute('min', beep.volume.MIN);
         VOLUME_ELEMENT.setAttribute('max', beep.volume.MAX);
         VOLUME_ELEMENT.setAttribute('step', 1);
-        DIT_ELEMENT.setAttribute('min', dit.MIN);
+        WPM_ELEMENT.setAttribute('min', dit.MIN);
 
         signalKey.modified = false;
         this.open = true;
@@ -402,7 +402,7 @@ function assignElements() {
     INPUT_ELEMENT = document.getElementById('input');
     OUTPUT_ELEMENT = document.getElementById('output');
     VOLUME_ELEMENT = document.getElementById('volume');
-    DIT_ELEMENT = document.getElementById('dit');
+    WPM_ELEMENT = document.getElementById('dit');
     SIGNAL_KEY_ELEMENT = document.getElementById('signal-key');
     SETTINGS_ELEMENT = document.getElementById('settings');
     OPEN_SETTINGS_ELEMENT = document.getElementById('open-settings');
