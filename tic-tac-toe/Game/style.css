@@ -1,0 +1,64 @@
+:root {
+    --black: #444444;
+    --lineWidth: 2vh;
+    --boardWidth: 75vh;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8vw;
+
+    height: 100vh;
+    margin: 0;
+
+    
+    font-size: 4vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#tic-tac-toe {
+    width: var(--boardWidth);
+    height: var(--boardWidth);
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+
+    grid-gap: var(--lineWidth);
+
+    background-color: var(--black);
+    color: var(--black);
+
+    cursor: pointer;
+
+    font-size: calc(var(--boardWidth) / 3 - var(--lineWidth) * 2);
+}
+
+.spot {
+    overflow: hidden;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+
+#status {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10vh;
+}
+
+@media screen and (max-width: 768px) {
+    :root {
+        --lineWidth: 1vh;
+        --boardWidth: 75vw;
+    }
+
+    body {
+        flex-direction: column;
+    }
+}
