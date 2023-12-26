@@ -1,0 +1,143 @@
+:root {
+    --background-color: #B0C4DE;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-image: url('./img/snowy_background.png');
+    background-size: contain;
+    background-position: 0 40vh;
+    background-repeat: no-repeat;
+    background-color: var(--background-color);
+    transition: background-color 360s;
+
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    margin: 0;
+    height: 100vh;
+
+    overflow: hidden;
+
+    perspective: 50vw;
+}
+
+.candy-cane {
+    position: absolute;
+    width: 8vw;
+
+}
+
+#candy-cane-1 {
+    top: 84vh;
+    left: 84vw;
+
+    transform: rotateZ(-15deg);
+
+    z-index: 1;
+}
+
+#candy-cane-2 {
+    top: 75vh;
+    left: 90vw;
+}
+
+#card {
+    position: relative;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 10;
+    padding: 2vw;
+
+    width: 20vh;
+    height: 20vh;
+
+    background-color: aliceblue;
+    box-shadow: 4px 4px 16px dimgray;
+
+    transition-duration: 0.2s;
+    transform-style: preserve-3d;
+
+    cursor: pointer;
+}
+
+#card:hover {
+    transform: scale(1.1) rotateZ(-1deg);
+}
+
+.card-face {
+    position: absolute;
+
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+#card-front {
+    width: 20vh;
+}
+
+#card-back {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 4vh;
+
+    transform: rotateY(180deg);
+}
+
+.handwritten {
+    font-family: cursive;
+
+    text-shadow: 2px 2px 2px lightgray;
+}
+
+#play-icon {
+    width: 4vh;
+    transition: 0.2s;
+
+    cursor: pointer;
+}
+
+#play-icon:hover {
+    scale: 1.2;
+
+    opacity: 0.8;
+}
+
+video {
+    display: none;
+
+    width: 12vw;
+}
+
+.snowflake {
+    position: fixed;
+
+    transition-timing-function: linear;
+    transition-duration: 2s;
+
+    pointer-events: none;
+
+    color: whitesmoke;
+
+    font-size: 3vw;
+}
+
+#sleigh {
+    position: absolute;
+    width: 20vw;
+
+    top: 20vh;
+    left: -20vw;
+    transform: scaleX(-1);
+    transition-duration: 10s;
+    transition-timing-function: linear;
+}
