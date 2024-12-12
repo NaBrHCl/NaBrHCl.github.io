@@ -3,13 +3,18 @@
     justify-content: space-around;
     align-items: center;
     flex-wrap: wrap;
+
+    gap: 2vw;
 }
 
-.card, .card:visited {
+.card {
     width: 20vw;
     border-radius: 1vw;
 
     background-color: var(--secondary-bg-color);
+}
+
+.card, .card:visited {
     color: var(--fg-color);
 }
 
