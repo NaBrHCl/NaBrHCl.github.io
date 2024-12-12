@@ -106,6 +106,10 @@ footer>section:nth-child(2) {
     gap: 1vh;
 }
 
+footer a {
+    color: var(--fg-color);
+}
+
 footer a:has(.icon) {
     display: inline-block;
     height: fit-content;

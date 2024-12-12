@@ -1,0 +1,49 @@
+.card-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.card, .card:visited {
+    width: 20vw;
+    border-radius: 1vw;
+
+    background-color: var(--secondary-bg-color);
+    color: var(--fg-color);
+}
+
+.card:hover {
+    scale: 1.05;
+}
+
+.card-body {
+    padding: 1vw;
+}
+
+.card-title {
+    border-bottom: 2px solid #BDC0BA;
+    padding-top: 0.5vw;
+    padding-bottom: 0.5vw;
+    font-size: x-large;
+}
+
+.card-text {
+    padding: 1vw;
+    font-size: large;
+}
+
+.card-tag {
+    display: inline-block;
+
+    background-color: var(--bg-color);
+    padding: 0.5vw;
+    margin: 0.2vw;
+    border-radius: 0.75vw;
+}
+
+.card>img {
+    width: 100%;
+    border-top-left-radius: 1vw;
+    border-top-right-radius: 1vw;
+}
